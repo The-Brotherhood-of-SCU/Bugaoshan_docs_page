@@ -5,11 +5,9 @@ on:
     branches:
       - "main"
     paths:
-      - ".github/workflows/docs_website-workflow.yml"
       - "docs/**"
   pull_request:
     paths:
-      - ".github/workflows/docs_website-workflow.yml"
       - "docs/**"
   workflow_dispatch:
 
@@ -55,7 +53,7 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         # 主仓库 push 自动部署；fork 里可手动触发（workflow_dispatch）部署用于测试
-        if: github.repository == 'The-Brotherhood-of-SCU/Bugaoshan' || github.event_name == 'workflow_dispatch'
+        if: github.repository == 'The-Brotherhood-of-SCU/Bugaoshan_docs_page' || github.event_name == 'workflow_dispatch'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: "./docs/.vuepress/dist"

@@ -4,4 +4,3 @@ node_modules/
 .vuepress/dist/
 *.log
 .DS_Store
-changelog
