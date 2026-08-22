@@ -37,5 +37,9 @@ dir:
 如果手册与当前应用界面不一致，建议先更新到最新版本，并通过[文档站主页](../)或应用内公告确认最近变更。
 
 ::: tip 反馈文档问题
-如果发现操作步骤过时、链接失效或说明不完整，欢迎通过 GitHub Issue 反馈，并附上应用版本、平台和相关页面截图。
+如果发现操作步骤过时、链接失效或说明不完整，可以向**文档站**仓库[提出Issue](https://github.com/The-Brotherhood-of-SCU/Bugaoshan_docs_page/issues)。
 :::
+
+## 请求其他功能？
+
+您可以添加官方QQ群反馈，或按照[Issue规范](../develop/guide/contribution-guide.html#issue-%E8%A7%84%E8%8C%83)在GitHub上提出Issue。
