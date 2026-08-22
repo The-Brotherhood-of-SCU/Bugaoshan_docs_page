@@ -37,10 +37,10 @@ export default defineUserConfig({
 
   theme: plumeTheme({
     // 站点地址，用于 editLink / sitemap 等
-    hostname: 'https://github.com/The-Brotherhood-of-SCU/Bugaoshan',
+    hostname: 'https://bugaoshan-docs.scubro.dev',
 
-    // 编辑此页链接，指向 Bugaoshan 仓库的 docs_website 目录
-    docsRepo: 'The-Brotherhood-of-SCU/Bugaoshan',
+    // 编辑此页链接，指向当前独立文档站仓库的 docs 目录
+    docsRepo: 'The-Brotherhood-of-SCU/Bugaoshan_docs_page',
     docsDir: '/docs',
     docsBranch: 'main',
 

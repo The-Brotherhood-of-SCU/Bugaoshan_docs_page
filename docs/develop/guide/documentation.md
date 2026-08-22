@@ -13,7 +13,7 @@ icon: mdi:file-document-edit-outline
 
 ## 文档组织
 
-文档站内容放在 `docs_website/` 目录下，顶层按读者划分：
+文档站是独立仓库 `Bugaoshan_docs_page`，内容放在仓库根目录的 `docs/` 目录下，顶层按读者划分：
 
 - `manual/` — 用户文档：面向 App 使用者，介绍功能与下载。
 - `changelog/` — 更新日志：面向 App 使用者，记录版本更新内容。
@@ -158,7 +158,7 @@ void main() => runApp(const App());
 ## 本地预览
 
 ```bash
-cd website
+cd docs
 pnpm install
 pnpm dev     # 本地开发，默认 http://localhost:8080
 pnpm build   # 构建到 .vuepress/dist
