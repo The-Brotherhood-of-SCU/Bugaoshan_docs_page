@@ -155,11 +155,79 @@ void main() => runApp(const App());
 - 临时实施清单、已完成的迁移步骤和可由 Git 直接还原的变更摘要不单独保留。
 - 架构文档的修改必须遵守各文档末尾的"不变量"或"修改检查清单"。
 
-## 本地预览
+## 文档站本地运行
+
+**大多数时候你并不需要用到以下的内容，确保你知道你在干什么。**
+
+文档站和 App 使用不同的工具链。文档站使用 Node.js、pnpm、VuePress 和 Vite。修改 Markdown 之前，先进入独立文档站仓库 `Bugaoshan_docs_page`，不要在主 App 仓库的根目录执行下面的命令。
+
+### 环境要求
+
+版本要求记录在 `docs/package.json` 的 `devEngines` 中：
+
+- [Node.js](https://nodejs.org/en/download) `24.19.0` 或更高版本；
+- [pnpm](https://pnpm.io/installation) `11.22.0` 或更高版本。
+
+安装 Node.js 后，确认终端能找到它：
+
+```bash
+node --version
+npm --version
+```
+
+### 安装 pnpm
+
+如果当前 Node.js 自带 Corepack，可以使用项目指定版本：
+
+```bash
+corepack enable
+corepack prepare pnpm@11.22.0 --activate
+```
+
+如果系统提示没有 `corepack`，可以用 npm 安装同一版本：
+
+```bash
+npm install --global pnpm@11.22.0
+```
+
+确认版本：
+
+```bash
+pnpm --version
+```
+
+版本不一致时，优先以 `docs/package.json` 和 `pnpm-lock.yaml` 中的项目配置为准，不要随意升级 VuePress 或主题版本。
+
+### 安装项目依赖
+
+在文档站仓库根目录执行：
 
 ```bash
 cd docs
 pnpm install
+```
+
+这一步会读取 `package.json` 和 `pnpm-lock.yaml`，安装 VuePress、主题、Vite、Mermaid 等构建依赖，并生成本地 `node_modules`。依赖缓存目录只用于本机，不应提交到 Git。
+
+日常开发可使用锁文件进行严格安装：
+
+```bash
+pnpm install --frozen-lockfile
+```
+
+如果只想安装依赖而不运行安装脚本，可以使用：
+
+```bash
+pnpm install --frozen-lockfile --ignore-scripts
+```
+
+### 本地预览和构建
+
+```bash
 pnpm dev     # 本地开发，默认 http://localhost:8080
 pnpm build   # 构建到 .vuepress/dist
 ```
+
+运行 `pnpm dev` 后打开终端显示的地址；修改 Markdown 后页面通常会自动刷新。停止开发服务器可在终端按 `Ctrl+C`。
+
+如果只修改了文档内容，可以先检查站内链接，再运行构建。构建失败时请保留完整错误信息，并记录 Node.js、pnpm 和操作系统版本。
