@@ -1,8 +1,9 @@
 name: Update Website Changelog
 
 on:
-  schedule:
-    - cron: '0 2 * * *'          # 每天 UTC 2:00 自动运行
+  repository_dispatch:
+    types:
+      - release_published
   workflow_dispatch:
     inputs:
       source_repo:
@@ -28,7 +29,7 @@ jobs:
       - name: Generate changelog pages
         uses: actions/github-script@v7
         env:
-          SOURCE_REPO: ${{ github.event.inputs.source_repo || 'The-Brotherhood-of-SCU/Bugaoshan' }}
+          SOURCE_REPO: ${{ github.event.client_payload.source_repo || github.event.inputs.source_repo || 'The-Brotherhood-of-SCU/Bugaoshan' }}
         with:
           # 使用 Repository Secret 中的 PAT
           github-token: ${{ secrets.PAT }}
@@ -270,4 +271,4 @@ jobs:
             echo "Changelog successfully pushed to main."
           fi
         env:
-          SOURCE_REPO: ${{ github.event.inputs.source_repo || 'The-Brotherhood-of-SCU/Bugaoshan' }}
+          SOURCE_REPO: ${{ github.event.client_payload.source_repo || github.event.inputs.source_repo || 'The-Brotherhood-of-SCU/Bugaoshan' }}
