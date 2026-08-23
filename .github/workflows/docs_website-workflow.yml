@@ -16,12 +16,14 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  # required for peaceiris/actions-gh-pages
-  contents: write
+  contents: read
+  # GitHub Pages 官方部署（actions/deploy-pages）所需权限
+  pages: write
+  id-token: write
 
 jobs:
   build:
-    name: Build and Deploy
+    name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -50,11 +52,21 @@ jobs:
         run: pnpm run build
         working-directory: "./docs"
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        # 主仓库 push 自动部署；fork 里可手动触发（workflow_dispatch）部署用于测试
-        if: github.repository == 'The-Brotherhood-of-SCU/Bugaoshan_docs_page' || github.event_name == 'workflow_dispatch'
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: "./docs/.vuepress/dist"
-          publish_branch: gh-pages
+          path: "./docs/.vuepress/dist"
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    # 主仓库 main 分支 push 自动部署；fork 里可手动触发（workflow_dispatch）部署用于测试
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'The-Brotherhood-of-SCU/Bugaoshan_docs_page') || github.event_name == 'workflow_dispatch'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
