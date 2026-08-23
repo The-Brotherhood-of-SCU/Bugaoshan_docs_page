@@ -1,6 +1,8 @@
 name: Update Website Changelog
 
 on:
+  schedule:
+    - cron: '0 2 * * *'
   repository_dispatch:
     types:
       - release_published
