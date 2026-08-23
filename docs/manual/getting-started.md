@@ -12,6 +12,10 @@ icon: mdi:rocket-launch-outline
 
 请从项目的 [GitHub Releases](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/releases/latest) 页面获取正式发布版本。
 
+::: tip 无法连接Github?
+您可以加入官方QQ群（1102483776），从群文件下载安装包。
+:::
+
 - **Android**：不确定设备架构时，选择文件名带有 `universal` 的 APK。
 - **Windows**：下载 `windows_x64` ZIP，完整解压后运行程序，不要单独移动可执行文件。
 - **Linux**：下载 `linux_x64` `tar.gz`，解压后运行；通知等 WebView 功能需要系统提供 WPE WebKit 运行库。

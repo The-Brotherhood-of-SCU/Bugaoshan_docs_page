@@ -41,6 +41,10 @@ editLink: false
 
 请前往 [GitHub Releases](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/releases/latest) 下载最新版本。
 
+::: tip 无法连接Github?
+您可以加入官方QQ群（1102483776），从群文件下载安装包。
+:::
+
 当前主仓库的正式发布流程自动构建以下平台：
 
 - Android

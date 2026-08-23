@@ -54,6 +54,21 @@ export default defineUserConfig({
     logo: `${base}images/logo.png`,
     appearance: true,
 
+    // 顶部右侧社交入口：QQ 图标打开群二维码，GitHub 图标打开主仓库
+    social: [
+      {
+        icon: 'qq',
+        link: `${base}Resource/QQGroup.jpg`,
+        ariaLabel: '加入官方 QQ 群',
+      },
+      {
+        icon: 'github',
+        link: 'https://github.com/The-Brotherhood-of-SCU/Bugaoshan',
+        ariaLabel: '打开 Bugaoshan GitHub 主仓库',
+      },
+    ],
+    navbarSocialInclude: ['qq', 'github'],
+
     aside: true,
     copyright: false,
     prevPage: true,
