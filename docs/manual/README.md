@@ -18,6 +18,7 @@ dir:
 - [通知与附件](./notices-and-downloads.md) — 三类通知来源、附件下载和文件管理
 - [设置与小组件](./settings-and-widgets.md) — Dock、主题、课程样式、字体和桌面小组件
 - [故障排查](./troubleshooting.md) — 登录、网络、导入、附件和小组件问题
+- [Linux 部署指南](./linux-deployment.md) — 在 Linux 上安装依赖、从源码构建和运行应用
 
 ## 推荐阅读顺序
 
@@ -37,7 +38,7 @@ dir:
 如果手册与当前应用界面不一致，建议先更新到最新版本，并通过[文档站主页](../)或应用内公告确认最近变更。
 
 ::: tip 反馈文档问题
-如果发现操作步骤过时、链接失效或说明不完整，可以向**文档站**仓库[提出Issue](https://github.com/The-Brotherhood-of-SCU/Bugaoshan_docs_page/issues)。
+如果发现操作步骤过时、链接失效或说明不完整乃至有误，可以向**文档站**仓库[提出Issue](https://github.com/The-Brotherhood-of-SCU/Bugaoshan_docs_page/issues)。
 :::
 
 ## 请求其他功能？

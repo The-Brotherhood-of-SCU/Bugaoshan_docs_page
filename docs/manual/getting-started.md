@@ -18,9 +18,9 @@ icon: mdi:rocket-launch-outline
 
 - **Android**：不确定设备架构时，选择文件名带有 `universal` 的 APK。
 - **Windows**：下载 `windows_x64` ZIP，完整解压后运行程序，不要单独移动可执行文件。
-- **Linux**：下载 `linux_x64` `tar.gz`，解压后运行；通知等 WebView 功能需要系统提供 WPE WebKit 运行库。
+- **Linux**：目前没有随正式版 Release 发布的 Linux 安装包，需要按 [Linux 部署指南](./linux-deployment.md) 从源码构建。
 
-主发布流程当前自动构建 Android、Windows 和 Linux。iOS、macOS 的安装渠道以公告和 Release 页面实际提供的制品为准。
+Linux 的构建和运行需要 Linux 系统提供 GTK、WPE WebKit 等桌面依赖；iOS、macOS 的安装渠道以公告和 Release 页面实际提供的制品为准。
 
 ## 首次启动
 

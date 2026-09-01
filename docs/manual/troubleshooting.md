@@ -18,6 +18,10 @@ icon: mdi:wrench-outline
 
 确认已经完成统一身份认证，选择正确学期，并检查导入数据格式。在线导入失败时可以稍后重试，或使用分享数据、教务系统抓包数据导入。
 
+## 课表时间不符合我所在的校区？
+
+在 我的-课表设置-时间段 中选择你所属的校区时间段。
+
 ## 附件和小组件异常
 
 附件下载失败时检查网络、存储权限和剩余空间。小组件没有更新时打开应用刷新课表，并确认系统允许应用使用小组件。
@@ -42,4 +46,3 @@ icon: mdi:wrench-outline
 
 - 不高山上/Bugaoshan 官方QQ群
 - GitHub Issue页（参照[Issue规范](../develop/guide/contribution-guide.html#issue-%E8%A7%84%E8%8C%83)）
-

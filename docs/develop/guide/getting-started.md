@@ -15,7 +15,7 @@ icon: mdi:rocket-launch-outline
 - **依赖（dependency）**：项目使用的第三方库，例如 Flutter 的网络请求、数据库和界面组件。
 - **分支（branch）**：在不影响 `main` 主线的情况下进行一组修改的独立工作区。
 - **代码生成**：根据注解或配置自动生成 Dart 文件，例如依赖注入和国际化文件。
-- **构建产物**：编译后生成的 APK、Windows 程序或 Linux 压缩包，不应当当作源代码修改提交。
+- **构建产物**：编译后生成的 APK、Windows 程序或 Linux 桌面构建目录，不应当当作源代码修改提交。
 
 ## 一、准备工具
 
@@ -39,7 +39,7 @@ flutter doctor -v
 
 - **Android**：安装 [Android Studio](https://developer.android.com/studio)、Android SDK 和一个模拟器，或连接已开启开发者选项的实体设备。(当然，直接向你的手机传输apk也不失为一种办法)
 - **Windows**：Windows 桌面目标需要 [Visual Studio](https://visualstudio.microsoft.com/downloads/) 的桌面 C++ 工具，以及 [NuGet CLI](https://learn.microsoft.com/en-us/nuget/install-nuget-client-tools?tabs=windows#nugetexe-cli)；后者是 `flutter_inappwebview` 的 Windows 目标所需依赖。
-- **Linux**：按照 [Flutter Linux 桌面环境要求](https://docs.flutter.dev/platform-integration/linux/setup) 安装 GTK 3、WPE WebKit 2.0、WPEBackend-fdo、libwpe、libsecret、libepoxy 和 Wayland 开发包。正式 Linux 发布包会动态链接这些系统库，不会把 WPE WebKit 一起打包。
+- **Linux**：按照 [Flutter Linux 桌面环境要求](https://docs.flutter.dev/platform-integration/linux/setup) 安装 GTK 3、WPE WebKit 2.0、WPEBackend-fdo、libwpe、libsecret、libepoxy 和 Wayland 开发包。Linux 源码构建产物会动态链接这些系统库，不会把 WPE WebKit 一起打包。
 - **iOS/macOS**：需要 macOS 和 [Xcode](https://developer.apple.com/xcode/) 以及对应的签名/开发环境；普通 Windows 或 Linux 电脑不能直接构建 Apple 平台应用。
 
 ## 二、下载项目

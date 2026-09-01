@@ -45,11 +45,12 @@ editLink: false
 您可以加入官方QQ群（1102483776），从群文件下载安装包。
 :::
 
-当前主仓库的正式发布流程自动构建以下平台：
+当前主仓库的正式发布流程主要提供以下平台：
 
 - Android
 - Windows
-- Linux
+
+Linux 目前不提供正式版预编译安装包，需要按照[Linux 部署指南](./manual/linux-deployment.md)从源码构建。
 
 主仓库代码同时提供 iOS 和 macOS 支持，但这两个平台的安装渠道以项目公告和 Release 页面实际提供的制品为准。
 
