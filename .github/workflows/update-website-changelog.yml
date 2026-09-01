@@ -110,7 +110,7 @@ jobs:
                 '',
                 '# 更新日志',
                 '',
-                '本栏目按版本记录不高山上的功能更新与修复。内容随 GitHub Release 自动更新。',
+                '本栏目按版本记录不高山上的功能更新与修复。内容随 GitHub 正式版 Release 自动更新。',
                 '',
                 '## 版本记录',
                 '',
@@ -167,6 +167,8 @@ jobs:
               )
 
               entries = releases
+                // 只同步已发布的正式版，排除草稿和预发布版本。
+                .filter(r => !r.draft && !r.prerelease)
                 .map(r => ({
                   tag: (r.tag_name || '').replace(/^v/, ''),
                   date: (r.published_at || '').slice(0, 10),
@@ -175,7 +177,7 @@ jobs:
                 .filter(e => e.tag)
 
               console.log(
-                `从 ${sourceOwner}/${sourceRepo} 拉取到 ${entries.length} 个 release`
+                `从 ${sourceOwner}/${sourceRepo} 拉取到 ${releases.length} 个 release，筛选出 ${entries.length} 个正式版`
               )
             } catch (err) {
               console.log(
@@ -206,6 +208,19 @@ jobs:
 
             // 写入各版本页面 + 索引 + 最新版
             fs.mkdirSync(CHANGELOG_DIR, { recursive: true })
+
+            // 清理之前生成但已不属于正式版集合的页面（例如历史预发布版本）。
+            const generatedFiles = new Set(entries.map(e => `${e.tag}.md`))
+            for (const file of fs.readdirSync(CHANGELOG_DIR)) {
+              if (
+                file.endsWith('.md') &&
+                file !== 'README.md' &&
+                file !== '_latest.md' &&
+                !generatedFiles.has(file)
+              ) {
+                fs.rmSync(path.join(CHANGELOG_DIR, file))
+              }
+            }
 
             entries.forEach((e, i) => {
               const p = path.join(
