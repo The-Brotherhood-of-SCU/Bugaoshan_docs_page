@@ -31,6 +31,7 @@ import { ThemeCollectionItem, ThemeNavItem, ThemeSidebarItem } from 'vuepress-th
 interface MetaData {
   baseName: string
   order: number
+  releaseDate?: string
   title: string
   icon: string
   index?: boolean
@@ -70,6 +71,8 @@ function getMetaData(dir: string, entry: fs.Dirent): MetaData | null {
   const baseName = path.parse(entry.name).name
   // 获取顺序，目录的 order 在 meta.dir.order 里，文件的 order 在 meta.order 里，默认值为一个大数
   const order = Number((entry.isDirectory() ? meta?.dir?.order : meta?.order) ?? Number.MAX_SAFE_INTEGER)
+  // 更新日志的发布日期目前记录在正文中，使用 ISO 日期字符串以便直接进行字典序比较。
+  const releaseDate = /^[ \t]*-[ \t]*发布日期：[ \t]*(\d{4}-\d{2}-\d{2})[ \t]*$/m.exec(fileContent)?.[1]
   // 获取标题，先从 frontmatter 里找 title，再用正则获取一级标题，最后 fallback 到文件名（不含扩展名）
   const title = String(meta?.title ?? RegExp('# (.+)').exec(fileContent)?.[1] ?? baseName)
   // 获取图标
@@ -82,6 +85,7 @@ function getMetaData(dir: string, entry: fs.Dirent): MetaData | null {
   return {
     baseName: baseName,
     order: order,
+    releaseDate: releaseDate,
     title: title,
     icon: icon,
     index: index,
@@ -93,6 +97,7 @@ function getSidebarItems(dir: string): SidebarItem[] {
   interface WrappedSidebarItem {
     sidebarItem: SidebarItem
     order: number
+    releaseDate?: string
   }
 
   // 过滤隐藏文件（. 开头）和临时/内部文件（_ 开头，如 _latest.md）
@@ -127,9 +132,31 @@ function getSidebarItems(dir: string): SidebarItem[] {
       sidebarItem = entry.name
     }
 
-    sidebarItemsWithOrder.push({ sidebarItem: sidebarItem, order: metaData.order })
+    sidebarItemsWithOrder.push({
+      sidebarItem: sidebarItem,
+      order: metaData.order,
+      releaseDate: metaData.releaseDate,
+    })
   }
-  sidebarItemsWithOrder.sort((a, b) => a.order - b.order)
+  const isChangelog = path.basename(dir).toLowerCase() === 'changelog'
+  sidebarItemsWithOrder.sort((a, b) => {
+    if (isChangelog) {
+      // 日期越新越靠前；缺少日期的条目排在有日期的条目之后。
+      if (a.releaseDate && b.releaseDate) {
+        const dateComparison = b.releaseDate.localeCompare(a.releaseDate)
+        if (dateComparison !== 0) {
+          return dateComparison
+        }
+      } else if (a.releaseDate) {
+        return -1
+      } else if (b.releaseDate) {
+        return 1
+      }
+    }
+
+    // 同日或都缺少日期时沿用 frontmatter order 作为稳定兜底。
+    return a.order - b.order
+  })
   return sidebarItemsWithOrder.map((i) => i.sidebarItem)
 }
 
