@@ -8,7 +8,7 @@ icon: mdi:shield-key-outline
 
 > 文档状态：当前实现的权威说明
 >
-> 最后核对：2026-07-31
+> 最后核对：2026-09-04
 >
 > 关键决策见 [ADR-0002：拆分子系统认证并显式声明依赖](../decisions/0002-separate-subsystem-authentication.md)。若本文与代码不一致，以代码为准，并应在同一变更中更新本文。
 
@@ -24,6 +24,8 @@ icon: mdi:shield-key-outline
 | 缴费平台 | `payapp.scu.edu.cn` | 电费、空调余额 |
 | 体测系统 | `pead.scu.edu.cn` | 体测成绩和通知 |
 | 第二课堂 | `dekt.scu.edu.cn` | 活动、报名、学分、用户信息 |
+| 智慧后勤 | `zhhq.scu.edu.cn` | 在线报修（地址、项目、工单） |
+| 校园网无感认证 | `newservice.scu.edu.cn` | 绑定设备 MAC 自动认证（Passpoint） |
 
 设计目标：
 
@@ -58,6 +60,8 @@ flowchart TB
         PA[PayAppAuth]
         FA[FitnessAuth]
         CA[CcylAuth]
+        ZHA[ZhhqAuth]
+        NSA[NewServiceAuth]
     end
 
     subgraph L3["L3 根认证"]
@@ -75,23 +79,31 @@ flowchart TB
     API --> WA
     API --> PA
     API --> CA
+    API --> ZHA
+    API --> NSA
     UI -->|体测页面当前直接请求| FA
     ZA --> SA
     WA --> SA
     PA --> SA
     FA --> SA
     CA -->|OAuth bridge| SA
+    ZHA --> SA
+    NSA --> SA
     AC --> ZA
     AC --> WA
     AC --> PA
     AC --> FA
     AC --> CA
+    AC --> ZHA
+    AC --> NSA
     SA --> INFRA
     ZA --> INFRA
     WA --> INFRA
     PA --> INFRA
     FA --> INFRA
     CA --> INFRA
+    ZHA --> INFRA
+    NSA --> INFRA
 ```
 
 ### 2.1 各层职责
@@ -136,12 +148,16 @@ flowchart TD
     WFW["WfwAuth<br/>无 L2 前置依赖"]
     FITNESS["FitnessAuth<br/>无 L2 前置依赖"]
     CCYL["CcylAuth<br/>无 L2 前置依赖"]
+    ZHHQ["ZhhqAuth<br/>无 L2 前置依赖"]
+    NEWSVC["NewServiceAuth<br/>无 L2 前置依赖"]
     PAYAPP["PayAppAuth<br/>依赖 WfwAuth"]
 
     SCU --> ZHJW
     SCU --> WFW
     SCU --> FITNESS
     SCU -.OAuth code.-> CCYL
+    SCU --> ZHHQ
+    SCU --> NEWSVC
     SCU --> PAYAPP
     WFW -->|L2 dependency| PAYAPP
 ```
@@ -155,6 +171,8 @@ flowchart TD
 | `FitnessAuth` | 无 | 共享 `CookieClient` 中的体测 cookie | 通过 `SsoRelayAuth` 完成 SSO 跳转 |
 | `PayAppAuth` | `WfwAuth` | 共享 `CookieClient` 中的 `airWarrant` 等 cookie | WFW 就绪后通过 `SsoRelayAuth` 完成缴费平台 SSO |
 | `CcylAuth` | 无 | 独立 OAuth token | token 与当前 SCU principal 绑定，不共享 cookie session |
+| `ZhhqAuth` | 无 | 独立 `CookieClient` + tokenKey | SSO（scdxplugin_jwt31）→ `login/auto` 换取 tokenKey；tokenKey 持久化到安全存储，`init()` 无条件恢复，业务请求只依赖 Token/TokenKey 头，不依赖 SCU 会话 |
+| `NewServiceAuth` | 无 | 共享 `CookieClient` | 校园网无感认证（Passpoint），绑定设备 MAC 自动认证 |
 
 ### 3.1 为什么 PayApp 依赖 WFW
 
@@ -176,9 +194,9 @@ WFW 首页也不能用来预热：它匿名访问直接返回 200 并下发匿�
 [`AuthCoordinator`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/services/auth/auth_coordinator.dart) 在统一认证成功后进行尽力而为的后台预热：
 
 ```text
-zhjw + wfw + fitness + ccyl   concurrently
+zhjw + wfw + fitness + ccyl + zhhq + newservice   concurrently
          |
-         +-> payapp           waits only for wfw
+         +-> payapp   waits only for wfw
 ```
 
 实际实现不是预先生成拓扑层，而是立即为所有顶级模块创建任务；每个任务递归等待自己的 `dependencies`。同一轮中，每个模块的 Future 会被缓存，因此被多个下游依赖时仍只执行一次。
@@ -319,6 +337,7 @@ TTL 到期本身不会先把状态切换为 `expired`。系统会直接尝试刷
 | WFW 登录链预热 | `WfwAuth._warmUpFuture` |
 | PayApp / Fitness SSO | `SsoRelayAuth._loginFuture` |
 | CCYL 自动重登录与过期恢复 | `CcylAuth._reLoginFuture` |
+| 智慧后勤 tokenKey 换取 | `ZhhqAuth._warmUpFuture`（single-flight） |
 
 ### 6.3 登出期间的旧任务
 
@@ -371,7 +390,24 @@ ensureAuthenticated
 
 这是当前实现的例外，不应据此把新的后端 HTTP 逻辑继续放入页面。后续若体测 API 扩大，应提取无状态 `FitnessApiService` 并统一恢复边界。
 
-### 7.4 HTTP ClientException
+### 7.4 Zhhq（在线报修）快速路径
+
+智慧后勤业务请求只依赖 `Token`/`TokenKey` 头，不依赖 SCU 会话，因此恢复策略与 cookie 型模块不同：
+
+```text
+getClientFast（tokenKey 已持久化/恢复）
+  -> business request（Token + TokenKey 头）
+  -> 4010-4017（token 错误）→ UnauthenticatedException
+  -> ZhhqAuth.invalidate() + 完整认证（SSO → login/auto 重建 tokenKey）
+  -> replay business request once
+```
+
+- `init()` 无条件从安全存储恢复 tokenKey，冷启动即可走快速路径，无需等待 SCU 会话。
+- 快速路径使用独立的 `CookieClient`（`getClientFast()`），与 SCU cookie 相互隔离。
+- 业务错误判定：`status` 明确非 `success` 或 `errorCode` 明确非 `0` 均抛 `ServiceException`（避免漏判错误响应）。
+- 图片上传是明文 JSON（不走 AES 解密），使用独立超时（30s，普通 JSON 请求 15s）。
+
+### 7.5 HTTP ClientException
 
 [`CookieClient`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/services/auth/cookie_client.dart) 在底层 `http.Client` 抛 `ClientException` 时会重建 client 并重发一次。这是传输层恢复，与认证重试相互独立。第二次失败直接上抛。
 
@@ -484,6 +520,7 @@ L3 ScuAuth
 | 保存的账号密码 | `FlutterSecureStorage` | 仅自动登录使用 |
 | 自动登录开关 | `FlutterSecureStorage` | 与凭据策略一起管理 |
 | CCYL session | `FlutterSecureStorage` | token + userId + SCU principal |
+| 智慧后勤 tokenKey | `FlutterSecureStorage` | zhhq 域会话标识，与 SCU 会话独立 |
 | SCU 登录时间 | `SharedPreferences` | 本地 TTL 判断，不是凭据 |
 | 用户姓名、学号缓存 | `SharedPreferences` | 退出登录时清理 |
 
@@ -523,10 +560,14 @@ flowchart TD
     PAYAPP --> COORD
     FITNESS --> COORD
     CCYL --> COORD
+    ZHHQ --> COORD
+    NEWSVC --> COORD
     ZHJW --> ZAPI[ZhjwApiService]
     WFW --> WAPI[WfwApiService]
     PAYAPP --> PAPI[PayAppApiService]
     CCYL --> CAPI[CcylApiService]
+    ZHHQ --> ZHAPI[ZhhqApiService]
+    NEWSVC --> NAPI[NewServiceApiService]
     SCU --> SAP[ScuAuthProvider]
     CCYL --> SAP
     COORD --> SAP
@@ -538,6 +579,8 @@ flowchart TD
     PAPI --> BQP
     CCYL --> CP[CcylProvider]
     CAPI --> CP
+    ZHAPI --> ZRP[ZhhqRepairProvider]
+    NAPI --> PP[PasspointProvider]
 ```
 
 退出登录由 `ScuAuthProvider.logout()` 统一编排：
@@ -559,7 +602,9 @@ lib/
 │   ├── train_program_provider.dart
 │   ├── plan_completion_provider.dart
 │   ├── balance_query_provider.dart
-│   └── ccyl_provider.dart
+│   ├── ccyl_provider.dart
+│   ├── zhhq_repair_provider.dart   # 在线报修状态
+│   └── passpoint_provider.dart     # 校园网无感认证状态
 ├── services/
 │   ├── api/
 │   │   ├── api_request.dart         # 通用认证失败重试一次
@@ -567,7 +612,9 @@ lib/
 │   │   ├── wfw_api_service.dart
 │   │   ├── payapp_api_service.dart
 │   │   ├── balance_query_service.dart
-│   │   └── ccyl_api_service.dart    # CCYL 精确过期恢复
+│   │   ├── ccyl_api_service.dart    # CCYL 精确过期恢复
+│   │   ├── zhhq_api_service.dart    # 在线报修：tokenKey 快速路径 + 4010-4017 重建
+│   │   └── new_service_api_service.dart
 │   ├── auth/
 │   │   ├── auth_state.dart
 │   │   ├── scu_exceptions.dart
@@ -581,7 +628,9 @@ lib/
 │   │   ├── payapp_auth.dart
 │   │   ├── fitness_auth.dart
 │   │   ├── ccyl_auth.dart
-│   │   └── ccyl_oauth_service.dart
+│   │   ├── ccyl_oauth_service.dart
+│   │   ├── zhhq_auth.dart           # 在线报修：SSO → tokenKey，持久化快速路径
+│   │   └── new_service_auth.dart    # 校园网无感认证（Passpoint）
 │   └── ccyl/
 │       └── ccyl_service.dart        # CCYL 底层 HTTP 与业务错误分类
 ├── utils/
