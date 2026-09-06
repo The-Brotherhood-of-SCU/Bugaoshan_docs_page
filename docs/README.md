@@ -5,9 +5,18 @@ editLink: false
 
 # 不高山上 · Bugaoshan
 
+::: center
+
+![Bugaoshan =256x256](/images/logo.png)
+
+[![Flutter](https://img.shields.io/badge/Flutter-3.44-02569B?logo=flutter&logoColor=white)](https://flutter.dev)[![Dart](https://img.shields.io/badge/Dart-3.10-0175C2?logo=dart&logoColor=white)](https://dart.dev)[![License](https://img.shields.io/badge/License-AGPL3.0-green.svg)](LICENSE)  
+[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Android%20%7C%20Windows%20%7C%20macOS-blue)](https://flutter.dev)  
+![stars](https://img.shields.io/github/stars/The-Brotherhood-of-SCU/Bugaoshan?style=social) ![GitHub all releases](https://img.shields.io/github/downloads/The-Brotherhood-of-SCU/Bugaoshan/total?style=social)  
+
 **不高山上**（Bugaoshan）是由 **The-Brotherhood-of-SCU** 团队开发的四川大学校园助手 App，聚合课表、成绩、通知、校园服务和个性化工具，帮助川大学生处理日常学习与校园事务。
 
 “不高山”是江安校区的一处标志性地标。App 以此命名，寓意扎根校园、服务同学。
+:::
 
 ## 从这里开始
 
@@ -18,8 +27,9 @@ editLink: false
 
 ## 功能概览
 
-### 办事大厅与校园事务
+### 校园事务
 
+- 在线提交宿舍或教室设施的维修工单
 - 在线提交离校请假申请，并查看请假、报备等申请记录
 - 办理返校报备、暑假离校和留校登记
 - 查询第二课堂活动、体测记录、空闲教室、校园网设备、校园卡和各类生活余额
@@ -128,3 +138,35 @@ Linux 目前不提供正式版预编译安装包，需要按照[Linux 部署指�
 本应用为非官方第三方应用，与四川大学不存在隶属、授权或认可关系。
 
 本项目基于 [AGPL-3.0](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/LICENSE) 协议开源。使用本软件前请阅读 [EULA](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/assets/eula.md)。
+
+## 友情链接
+
+### The Brotherhood of SCU
+
+::: center
+![The Brotherhood of SCU =256x256](/images/friend-links/SCUBRO.png)
+
+一个非官方的四川大学开源组织
+
+[官网](https://scubro.dev/)|[Github](https://github.com/The-Brotherhood-of-SCU)
+:::
+
+### SCU SFA
+
+::: center
+![SCU SFA =256x256](/images/friend-links/SCUSFA.png)
+
+四川大学科幻协会是中国第一个高校科幻社团，正式成立于1993年4月2日。曾四次获得中国科幻银河奖最佳科幻团体奖，并多次获得校级及全国性科幻奖项。
+
+[官网](https://xiaosi-sfa.github.io/)|[Github](https://github.com/Xiaosi-SFA)|[Bilibili](https://space.bilibili.com/247659023)
+:::
+
+### SCU MAKER
+
+::: center
+![SCU MAKER =256x256](/images/friend-links/SCUMAKER.png)
+
+开源硬件协会成立于2015年9月，是一个科技类学术社团，始终坚守“传递科技薪火，发扬开源精神”的初心，致力于将计算机软硬件知识转化为实际应用，帮助同学们将创意变为现实。
+
+[官网](http://www.scumaker.org/)|[Github](https://github.com/SCU-Maker-Org)
+:::
