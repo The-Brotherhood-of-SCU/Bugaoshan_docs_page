@@ -19,6 +19,7 @@ dir:
 - [设置与小组件](./settings-and-widgets.md) — Dock、主题、课程样式、字体和桌面小组件
 - [故障排查](./troubleshooting.md) — 登录、网络、导入、附件和小组件问题
 - [Linux 部署指南](./linux-deployment.md) — 在 Linux 上安装依赖、从源码构建和运行应用
+- [常用服务初始密码](./initial-passwords.md) — 常见校园服务的初始登录规则
 
 ## 推荐阅读顺序
 
