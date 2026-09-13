@@ -71,15 +71,35 @@ docs: 更新贡献规范文档
 - `subject` 用祈使句、简短（一般不超过 50 字符）。
 - 提交前先格式化代码。仓库内置 pre-commit hook，会对你暂存的 `.dart` 文件自动执行 `dart format`；请先按[环境与构建](./getting-started.md#pre-commit-hook)安装 hook。
 
+## 分支模型与发布流水线
+
+项目采用严格单向流转的两级分支流，**没有 dev 分支**，`preview` 兼任日常集成分支：
+
+```text
+日常开发分支 (feat/*, fix/*, docs/* ...)
+       │  发起 PR（触发 pre-flight 门禁）
+       ▼
+preview ──── 合并即自动发 vX.Y.Z-preview[.N] 预览版（Prerelease）
+       │  仅允许来自 preview 的 PR（触发 pre-flight 门禁）
+       ▼
+main ─────── 合并即自动发 vX.Y.Z 正式版（Latest Release & F-Droid）
+```
+
+- **所有日常功能与修复**（`feat/*`、`fix/*`、`docs/*` 等）：从 `preview` 切出分支，PR 统一发往 **`preview`**。
+- **禁止向 `main` 直接推送或提交日常 PR**：`main` 只接收来自 `preview` 的 Pull Request，正式版统一由 `preview → main` 的发布 PR 流转。
+- **PR 门禁（pre-flight）**：向 `preview`、`main` 发起 PR 时自动执行分支合规检查、`dart analyze --fatal-infos`、生成文件漂移检测、`flutter test` 与发布前预检；本地先跑一遍同样的检查可以更快拿到反馈。
+
+版本号推导、双通道发布行为与已知边界情况的完整说明见[发布流水线](../architecture/release-pipeline.md)。
+
 ## Pull Request 规范
 
 ### 创建 PR 前
 
-1. 从最新 `main` 拉取，创建**功能分支**：
+1. 从最新 `preview` 分支拉取并创建**功能分支**：
 
    ```bash
-   git checkout main
-   git pull origin main
+   git checkout preview
+   git pull origin preview
    git checkout -b feature/your-feature
    ```
 
@@ -96,7 +116,7 @@ docs: 更新贡献规范文档
 
 - **如果你正在使用AI，请确保你知道自己在干什么。**
 - 保持 PR 聚焦：一个 PR 尽量只解决一个问题，便于 review。
-- 若主分支有更新，用 `git rebase` 保持提交历史干净，而不是反复 merge（如果你不清楚rebase的操作，就不要sync)。
+- 若 `preview` 分支有更新，用 `git rebase` 保持提交历史干净，而不是反复 merge（如果你不清楚rebase的操作，就不要sync)。
 - 收到 review 意见后及时跟进；修改后更新你的分支。
 
 ## 提交流程一览
@@ -109,10 +129,10 @@ flowchart TD
     B -->|没有| D[提交 Issue<br/>描述清楚]
     C --> D
     D --> E[认领或等维护者确认]
-    E --> F[拉最新 main<br/>建功能分支]
+    E --> F[拉最新 preview<br/>建功能分支]
     F --> G[写代码<br/>dart format + flutter analyze]
     G --> H[Conventional Commits 提交]
-    H --> I[推送分支<br/>创建 PR]
+    H --> I[推送分支<br/>PR 至 preview]
     I --> J[关联 Issue<br/>描述改动]
     J --> K[处理 review 意见]
     K --> L[合并<br/>关闭 Issue]

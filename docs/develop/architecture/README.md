@@ -16,6 +16,7 @@ dir:
 | [通知 WebView 架构](./notice-webview.md) | [ADR-0001](../decisions/0001-use-webview-and-js-injection-for-notices.md) | 三类通知来源、JS bridge、附件下载和平台边界 | 当前实现 |
 | [认证架构](./authentication.md) | [ADR-0002](../decisions/0002-separate-subsystem-authentication.md) | SCU 根认证、子系统认证、重试、会话隔离和 DI | 当前实现 |
 | [Linux 分发架构](./linux-distribution.md) | [ADR-0004](../decisions/0004-use-distribution-wpe-on-linux.md) | GitHub tar.gz、WPE 边界、Flatpak、AUR 和 Debian 状态 | 当前实现 |
+| [发布流水线](./release-pipeline.md) | — | 两级分支流、预览/正式双通道、版本号模型与边界情况 | 当前实现 |
 
 ::: tip 维护规则
 - 架构文档与代码冲突时以代码为准，并在同一变更中修正文档。

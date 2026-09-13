@@ -28,10 +28,10 @@ flowchart LR
 - **Issue**：用来讨论 Bug、功能建议或文档问题。
 - **Fork**：在自己的 GitHub 账号下复制一份仓库，获得推送权限。
 - **Clone**：把远程仓库下载到自己的电脑。
-- **分支**：一条独立的修改线路，不直接污染 main。
+- **分支**：一条独立的修改线路，不直接污染主线。
 - **Commit**：保存一组有意义的修改，并写下这次修改的说明。
 - **Push**：把本地分支上传到自己的 GitHub 仓库。
-- **Pull Request（PR）**：请求维护者把你的分支合并到项目的 main。
+- **Pull Request（PR）**：请求维护者把你的分支合并进项目分支。日常贡献统一发往 `preview`，正式版再由 `preview` 流转到 `main`。
 - **Review**：维护者检查代码、测试和文档，并提出修改建议。
 
 ## 你可以贡献什么
@@ -119,13 +119,13 @@ git remote -v
 
 ## 四、创建自己的分支
 
-不要直接在 main 上开发。先同步主仓库，再创建描述清楚的分支：
+不要直接在 `main` 上开发。项目的日常集成分支是 `preview`：先同步主仓库的 `preview`，再从它切出描述清楚的分支：
 
 ~~~bash
-git switch main
+git switch preview
 git fetch upstream
-git merge upstream/main
-git push origin main
+git merge upstream/preview
+git push origin preview
 git switch -c feature/course-export
 ~~~
 
@@ -139,9 +139,13 @@ git switch -c feature/course-export
 如果你的 Git 版本较旧，也可以使用等价命令：
 
 ~~~bash
-git checkout main
+git checkout preview
 git checkout -b feature/course-export
 ~~~
+
+::: tip PR 发往哪个分支
+日常贡献的 PR 一律发往 `preview`：`main` 只接收来自 `preview` 的 PR，禁止直接提交。PR 合入 `preview` 后会自动发布预览版，后续由维护者走 `preview → main` 的发布 PR 发正式版。完整规则见[分支模型与发布流水线](./contribution-guide.md#分支模型与发布流水线)。
+:::
 
 ## 五、修改代码时的基本习惯
 
@@ -179,6 +183,8 @@ git diff --check
 ~~~
 
 git diff 是给自己看的最终检查单。确认没有把 .dart_tool/、build/、IDE 配置、密钥或与本次任务无关的文件带进来。
+
+向 `preview` 或 `main` 发起 PR 时，CI 的 pre-flight 门禁会运行同样的检查（`dart analyze --fatal-infos`、`flutter test`、代码生成物漂移检测），本地先跑一遍能更快拿到反馈。
 
 ### 安装提交钩子
 
@@ -235,7 +241,7 @@ git push -u origin feature/course-export
 打开 GitHub 上自己的仓库，点击 **Compare & pull request**，确认：
 
 - **base repository** 是 The-Brotherhood-of-SCU/Bugaoshan；
-- **base branch** 是 main；
+- **base branch** 是 `preview`（`main` 只接收来自 `preview` 的 PR，日常贡献不要选它）；
 - **head repository** 是你的 Fork；
 - **compare branch** 是本次功能分支，而不是 main。
 
@@ -259,7 +265,7 @@ git commit -m "fix: 根据 review 调整课程导出提示"
 git push
 ~~~
 
-Push 到同一个分支后，PR 会自动更新。若主仓库有新的提交，先同步 main 再处理冲突；不熟悉 rebase 时不要盲目执行，先保留工作区备份并询问维护者。
+Push 到同一个分支后，PR 会自动更新。若 `preview` 有新的提交，先同步 `preview` 再处理冲突；不熟悉 rebase 时不要盲目执行，先保留工作区备份并询问维护者。
 
 ## 常见新手问题
 
