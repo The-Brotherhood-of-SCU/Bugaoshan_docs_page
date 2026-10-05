@@ -35,7 +35,7 @@ icon: mdi:lock-outline
 ## 遇到登录失败时
 
 1. 确认输入的是当前在用的身份证号或学号，并检查位数、大小写和是否包含空格。
-2. 不要反复尝试可能触发锁定的组合；您可以在统一身份认证中心中选择[重置密码](https://id.scu.edu.cn/frontend/login#/resetPassword)。
+2. 不要反复尝试可能触发锁定的组合；统一身份认证密码可在应用登录页点击“重置密码”，按[密码重置说明](./getting-started.md#忘记密码)操作，也可以通过[学校认证中心](https://id.scu.edu.cn/frontend/login#/resetPassword)重置。
 
 ::: tip 反馈文档问题
 如果发现操作步骤过时、链接失效或说明不完整乃至有误，可以向**文档站**仓库[提出Issue](https://github.com/The-Brotherhood-of-SCU/Bugaoshan_docs_page/issues)。
