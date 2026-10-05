@@ -49,7 +49,7 @@ editLink: false
 
 ## 下载与安装
 
-请前往 [GitHub Releases](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/releases/latest) 下载最新版本。
+iPhone、iPad 用户可前往 [App Store 下载不高山上](https://apps.apple.com/cn/app/%E4%B8%8D%E9%AB%98%E5%B1%B1%E4%B8%8A/id6813305962)。Android、Windows 用户请前往 [GitHub Releases](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/releases/latest) 下载最新版本。
 
 ::: tip 无法连接Github?
 您可以加入官方QQ群（1102483776），从群文件下载安装包。
@@ -62,10 +62,10 @@ editLink: false
 
 Linux 目前不提供正式版预编译安装包，需要按照[Linux 部署指南](./manual/linux-deployment.md)从源码构建。
 
-主仓库代码同时提供 iOS 和 macOS 支持，但这两个平台的安装渠道以项目公告和 Release 页面实际提供的制品为准。
+macOS 的安装渠道以项目公告和 Release 页面实际提供的制品为准。各平台的安装步骤请查看[快速入门](./manual/getting-started.md#下载与安装)。
 
 ::: tip 邀测
-**iOS 与鸿蒙版本正在邀测中**，欢迎加入官方 QQ 群（1102483776）参与测试。
+**鸿蒙版本正在邀测中**，欢迎加入官方 QQ 群（1102483776）参与测试。
 :::
 
 ## 获取帮助
@@ -82,7 +82,7 @@ Linux 目前不提供正式版预编译安装包，需要按照[Linux 部署指�
 
 ## 当前版本
 
-以下是最近一次发布的功能更新与修复。完整历史请查看[更新日志](./changelog/)。
+以下是最近一次发布的功能更新与修复。版本日志中的下载说明保留该版本发布时的状态，当前下载渠道请查看本页的[下载与安装](#下载与安装)。完整历史请查看[更新日志](./changelog/)。
 
 ::: details 最近更新
 <!-- @include: ./changelog/_latest.md -->

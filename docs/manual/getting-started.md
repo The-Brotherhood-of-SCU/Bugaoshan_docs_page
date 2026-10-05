@@ -10,17 +10,18 @@ icon: mdi:rocket-launch-outline
 
 ## 下载与安装
 
-请从项目的 [GitHub Releases](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/releases/latest) 页面获取正式发布版本。
+iPhone、iPad 用户请使用下方的 App Store 入口；Android、Windows 安装包可从项目的 [GitHub Releases](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/releases/latest) 页面获取。
 
 ::: tip 无法连接Github?
 您可以加入官方QQ群（1102483776），从群文件下载安装包。
 :::
 
+- **iPhone / iPad**：前往 [App Store 下载不高山上](https://apps.apple.com/cn/app/%E4%B8%8D%E9%AB%98%E5%B1%B1%E4%B8%8A/id6813305962)，点击“获取”安装。系统版本与设备兼容性以 App Store 页面为准。
 - **Android**：不确定设备架构时，选择文件名带有 `universal` 的 APK。
 - **Windows**：下载 `windows_x64` ZIP，完整解压后运行程序，不要单独移动可执行文件。
 - **Linux**：目前没有随正式版 Release 发布的 Linux 安装包，需要按 [Linux 部署指南](./linux-deployment.md) 从源码构建。
 
-Linux 的构建和运行需要 Linux 系统提供 GTK、WPE WebKit 等桌面依赖；iOS 需要 iOS 15 或更高版本，iOS、macOS 的安装渠道以公告和 Release 页面实际提供的制品为准。
+Linux 的构建和运行需要 Linux 系统提供 GTK、WPE WebKit 等桌面依赖；macOS 的安装渠道以公告和 Release 页面实际提供的制品为准。
 
 ## 首次启动
 
