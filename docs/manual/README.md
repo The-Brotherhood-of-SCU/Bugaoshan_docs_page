@@ -11,13 +11,13 @@ dir:
 
 ## 手册导航
 
-- [快速入门](./getting-started.md) — 下载安装、首次启动、登录、密码重置和导入第一份课表
-- [课表使用](./course-schedule.md) — 多课表、课程编辑与复制、周次和假期、日历导出
-- [学业服务](./academic-services.md) — 成绩与自定义统计、第二课堂、培养方案、体测、考表和课表查询
+- [快速入门](./getting-started.md) — 下载安装、首次启动、学生类型、登录、密码重置和导入第一份课表
+- [课表使用](./course-schedule.md) — 多课表、课程编辑与复制、自定义上课周次、周次和假期、日历与图片导出、锁屏实时活动
+- [学业服务](./academic-services.md) — 本科与研究生成绩、培养进度、第二课堂及其筛选、培养方案、体测、考表和课表查询
 - [校园生活服务](./campus-services.md) — 在线报修、办事大厅、教室、校园网、余额、校历和志愿四川
 - [通知与附件](./notices-and-downloads.md) — 三类通知来源、附件下载和文件管理
-- [设置与小组件](./settings-and-widgets.md) — Dock、主题、课程显示、字体、动画、小组件和版本更新
-- [故障排查](./troubleshooting.md) — 登录、网络、导入、附件和小组件问题
+- [设置与小组件](./settings-and-widgets.md) — 学生类型、Dock、深色模式、主题、课程显示、字体、动画、课前提醒、小组件和版本更新
+- [故障排查](./troubleshooting.md) — 登录、网络、导入、课前提醒未送达、启动失败恢复、附件和小组件问题
 - [Linux 部署指南](./linux-deployment.md) — 在 Linux 上安装依赖、从源码构建和运行应用
 - [常用服务初始密码](./initial-passwords.md) — 常见校园服务的初始登录规则
 
