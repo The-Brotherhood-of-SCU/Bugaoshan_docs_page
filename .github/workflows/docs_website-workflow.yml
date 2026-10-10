@@ -6,9 +6,15 @@ on:
       - "main"
     paths:
       - "docs/**"
+      - "README.md"
+      - ".github/lychee.toml"
+      - ".github/workflows/docs_website-workflow.yml"
   pull_request:
     paths:
       - "docs/**"
+      - "README.md"
+      - ".github/lychee.toml"
+      - ".github/workflows/docs_website-workflow.yml"
   workflow_dispatch:
 
 concurrency:
@@ -51,6 +57,16 @@ jobs:
       - name: Build
         run: pnpm run build
         working-directory: "./docs"
+
+      # 检查 VuePress 实际生成的页面，包含路由、静态资源和标题锚点。
+      # 检查失败会阻止制品上传及后续 deploy job。
+      - name: Check internal documentation links
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2
+        with:
+          lycheeVersion: v0.24.2
+          args: >-
+            --config .github/lychee.toml
+            -- './docs/.vuepress/dist/**/*.html' './README.md'
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5

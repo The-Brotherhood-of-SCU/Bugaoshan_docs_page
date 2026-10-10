@@ -1,0 +1,10 @@
+# 仅检查本次构建中的站内链接，不请求外部网站。
+offline = true
+no_progress = true
+include_fragments = "full"
+
+# VuePress 的 /images/...、/manual/... 等路径相对于构建目录解析。
+root_dir = "docs/.vuepress/dist"
+
+# 目录链接必须包含可访问的首页，不能仅凭目录存在就通过。
+index_files = ["index.html"]
