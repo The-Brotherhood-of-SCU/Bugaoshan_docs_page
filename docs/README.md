@@ -9,7 +9,7 @@ editLink: false
 
 ![Bugaoshan =256x256](/images/logo.png)
 
-[![Flutter](https://img.shields.io/badge/Flutter-3.44-02569B?logo=flutter&logoColor=white)](https://flutter.dev)[![Dart](https://img.shields.io/badge/Dart-3.10-0175C2?logo=dart&logoColor=white)](https://dart.dev)[![License](https://img.shields.io/badge/License-AGPL3.0-green.svg)](LICENSE)  
+[![Flutter](https://img.shields.io/badge/Flutter-3.44-02569B?logo=flutter&logoColor=white)](https://flutter.dev)[![Dart](https://img.shields.io/badge/Dart-3.10-0175C2?logo=dart&logoColor=white)](https://dart.dev)[![License](https://img.shields.io/badge/License-AGPL3.0-green.svg)](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/LICENSE)\
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Android%20%7C%20Windows%20%7C%20macOS-blue)](https://flutter.dev)  
 ![stars](https://img.shields.io/github/stars/The-Brotherhood-of-SCU/Bugaoshan?style=social) ![GitHub all releases](https://img.shields.io/github/downloads/The-Brotherhood-of-SCU/Bugaoshan/total?style=social)  
 

@@ -69,7 +69,7 @@ docs: 更新贡献规范文档
 
 - 一个提交只做一件事，不要把无关改动混在一起。
 - `subject` 用祈使句、简短（一般不超过 50 字符）。
-- 提交前先格式化代码。仓库内置 pre-commit hook，会对你暂存的 `.dart` 文件自动执行 `dart format`；请先按[环境与构建](./getting-started.md#pre-commit-hook)安装 hook。
+- 提交前先格式化代码。仓库内置 pre-commit hook，会对你暂存的 `.dart` 文件自动执行 `dart format`；请先按[环境与构建](./getting-started.md#八、安装提交钩子)安装 hook。
 
 ## 分支模型与发布流水线
 

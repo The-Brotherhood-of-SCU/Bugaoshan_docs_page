@@ -230,4 +230,13 @@ pnpm build   # 构建到 .vuepress/dist
 
 运行 `pnpm dev` 后打开终端显示的地址；修改 Markdown 后页面通常会自动刷新。停止开发服务器可在终端按 `Ctrl+C`。
 
-如果只修改了文档内容，可以先检查站内链接，再运行构建。构建失败时请保留完整错误信息，并记录 Node.js、pnpm 和操作系统版本。
+文档 PR、推送到 `main` 和手动运行工作流都会在构建后使用 Lychee 检查站内页面、静态资源和标题锚点。发现失效链接时，工作流会失败并停止部署；报告可在 Actions 运行摘要中查看。检查配置保存在 `.github/lychee.toml`，外部网站不参与这项部署检查。
+
+本地复现需要安装 [Lychee](https://github.com/lycheeverse/lychee) `0.24.2`，然后从文档站仓库根目录执行：
+
+```bash
+pnpm --dir docs build
+lychee --config .github/lychee.toml -- 'docs/.vuepress/dist/**/*.html' README.md
+```
+
+构建或检查失败时请保留完整错误信息，并记录 Node.js、pnpm 和操作系统版本。

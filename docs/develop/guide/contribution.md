@@ -87,7 +87,7 @@ dart run build_runner build --delete-conflicting-outputs
 flutter gen-l10n
 ~~~
 
-如果你只修改文档站，不需要准备 Flutter：文档站是独立仓库 [Bugaoshan_docs_page](https://github.com/The-Brotherhood-of-SCU/Bugaoshan_docs_page)，进入其 docs/ 目录后按照[文档依赖安装说明](./documentation.md#文档站依赖安装)安装 Node.js 和 pnpm，再使用 pnpm install 和 pnpm dev。
+如果你只修改文档站，不需要准备 Flutter：文档站是独立仓库 [Bugaoshan_docs_page](https://github.com/The-Brotherhood-of-SCU/Bugaoshan_docs_page)，进入其 docs/ 目录后按照[文档依赖安装说明](./documentation.md#安装项目依赖)安装 Node.js 和 pnpm，再使用 pnpm install 和 pnpm dev。
 
 ## 三、Fork、Clone 和设置远程仓库
 
