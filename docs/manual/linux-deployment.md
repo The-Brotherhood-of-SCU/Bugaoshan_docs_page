@@ -6,7 +6,7 @@ icon: mdi:linux
 
 # Linux 部署指南
 
-由于维护人员精力问题，目前 Linux 不提供随正式版 Release 发布的预编译安装包。
+Linux 提供随正式版发布的 `linux_x64.tar.gz` 预编译包，也可按本指南从源码构建。
 
 本页介绍在 Linux 电脑上从源码构建并运行不高山上，适用于 Ubuntu、Debian、Arch Linux 等能够安装 Flutter Linux 桌面依赖的发行版。
 
@@ -16,7 +16,7 @@ icon: mdi:linux
 
 ### Ubuntu / Debian
 
-打开终端，安装 Flutter 编译工具、GTK 和项目使用的 WebView 依赖：
+打开终端，安装 Flutter 编译工具与 GTK 桌面依赖：
 
 ```bash
 sudo apt update
@@ -24,22 +24,20 @@ sudo apt install -y \
   git curl unzip xz-utils zip \
   clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev \
   libsecret-1-dev libepoxy-dev \
-  libwpe-1.0-dev libwpebackend-fdo-1.0-dev libwpewebkit-2.0-dev \
   libwayland-dev
 ```
 
-如果当前发行版找不到某个 WPE 开发包，请先确认已启用对应的软件源，并使用 `apt search` 查找本发行版的包名。WPE WebKit、WPEBackend-fdo 和 libwpe 是 Linux 端网页视图功能所需的系统组件。
+Linux 端不提供原生 WebView，因此无需安装 WPE WebKit、WPEBackend-fdo 或 libwpe。
 
 ### Arch Linux
 
 ```bash
 sudo pacman -Syu --needed \
   git curl unzip xz zip \
-  clang cmake ninja pkgconf gtk3 libsecret libepoxy \
-  libwpe wpebackend-fdo wpewebkit wayland
+  clang cmake ninja pkgconf gtk3 libsecret libepoxy wayland
 ```
 
-Fedora、openSUSE 等发行版请安装对应的 GTK 3、Clang、CMake、Ninja、pkg-config、libsecret、libepoxy、WPE WebKit、WPEBackend-fdo、libwpe 和 Wayland 开发包。
+Fedora、openSUSE 等发行版请安装对应的 GTK 3、Clang、CMake、Ninja、pkg-config、libsecret、libepoxy 和 Wayland 开发包。
 
 ## 二、安装 Flutter
 
@@ -124,19 +122,13 @@ cp -a build/linux/x64/release/bundle/. "$HOME/.local/opt/bugaoshan/"
 
 ## 常见问题
 
-### 提示缺少 `libWPEWebKit` 或 `libwpebackend-fdo`
+### 提示缺少 GTK 或 Wayland 运行库
 
-这是 Linux 系统库缺失或版本不兼容。安装当前发行版对应的 WPE WebKit、WPEBackend-fdo 和 libwpe 运行库后重试。可以用下面的命令查看动态库是否仍有缺失：
+从终端启动应用，根据报错安装当前发行版对应的 GTK 3、libsecret、libepoxy 和 Wayland 运行库。可用 `ldd build/linux/x64/release/bundle/Bugaoshan | grep 'not found'` 检查动态库依赖。
 
-```bash
-ldd build/linux/x64/release/bundle/lib/libflutter_inappwebview_linux_plugin.so | grep 'not found'
-```
+### 通知或志愿四川显示“用浏览器打开此页面”
 
-没有输出通常表示该插件的动态链接库都能被系统找到。
-
-### 程序能启动，但通知或网页服务显示空白
-
-确认 WPE WebKit 运行库已安装，并从终端启动应用查看错误信息。通知、办事大厅等网页功能依赖系统 WebView，不能仅通过重新下载 Flutter 构建产物解决。
+Linux 端不提供应用内网页视图。通知公告、志愿四川等依赖网页的功能会显示交接页，点击按钮即可用系统默认浏览器打开目标地址，也可以复制链接后在浏览器中手动打开。登录与附件下载都在浏览器中完成；研究生课表导入仅保留直连路径。
 
 ### `flutter build linux` 提示找不到 Linux 设备
 

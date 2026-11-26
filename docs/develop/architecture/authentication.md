@@ -3,12 +3,11 @@ order: 2
 title: 认证架构
 icon: mdi:shield-key-outline
 ---
-
 # 认证架构
 
 > 文档状态：当前实现的权威说明
 >
-> 最后核对：2026-09-04
+> 最后核对：2026-07-31
 >
 > 关键决策见 [ADR-0002：拆分子系统认证并显式声明依赖](../decisions/0002-separate-subsystem-authentication.md)。若本文与代码不一致，以代码为准，并应在同一变更中更新本文。
 
@@ -17,15 +16,13 @@ icon: mdi:shield-key-outline
 本文描述 Bugaoshan 中需要 SCU 登录态的功能如何完成认证、子系统会话建立、业务请求、过期恢复和 UI 状态更新。覆盖以下后端：
 
 | 后端 | 认证入口 | 主要功能 |
-| --- | --- | --- |
+|---|---|---|
 | SCU 统一身份认证 | `id.scu.edu.cn` | 根 token、统一认证 session |
 | 教务系统 | `zhjw.scu.edu.cn` | 课表、成绩、教室、培养方案、考表 |
 | 微服务 | `wfw.scu.edu.cn` | 用户信息、校园服务标签 |
 | 缴费平台 | `payapp.scu.edu.cn` | 电费、空调余额 |
 | 体测系统 | `pead.scu.edu.cn` | 体测成绩和通知 |
 | 第二课堂 | `dekt.scu.edu.cn` | 活动、报名、学分、用户信息 |
-| 智慧后勤 | `zhhq.scu.edu.cn` | 在线报修（地址、项目、工单） |
-| 校园网无感认证 | `newservice.scu.edu.cn` | 绑定设备 MAC 自动认证（Passpoint） |
 
 设计目标：
 
@@ -60,15 +57,13 @@ flowchart TB
         PA[PayAppAuth]
         FA[FitnessAuth]
         CA[CcylAuth]
-        ZHA[ZhhqAuth]
-        NSA[NewServiceAuth]
     end
 
     subgraph L3["L3 根认证"]
         SA["ScuAuth<br/>token / principal / id.scu.edu.cn session / refresh"]
     end
 
-    INFRA["基础设施<br/>CookieClient / FlutterSecureStorage / SharedPreferences / AuthLogger"]
+    INFRA["基础设施<br/>CookieClient / FlutterSecureStorage / SharedPreferences / AppLogger"]
 
     UI --> P
     P --> API
@@ -79,37 +74,29 @@ flowchart TB
     API --> WA
     API --> PA
     API --> CA
-    API --> ZHA
-    API --> NSA
     UI -->|体测页面当前直接请求| FA
     ZA --> SA
     WA --> SA
     PA --> SA
     FA --> SA
     CA -->|OAuth bridge| SA
-    ZHA --> SA
-    NSA --> SA
     AC --> ZA
     AC --> WA
     AC --> PA
     AC --> FA
     AC --> CA
-    AC --> ZHA
-    AC --> NSA
     SA --> INFRA
     ZA --> INFRA
     WA --> INFRA
     PA --> INFRA
     FA --> INFRA
     CA --> INFRA
-    ZHA --> INFRA
-    NSA --> INFRA
 ```
 
 ### 2.1 各层职责
 
 | 层 | 组件 | 状态 | 职责 |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | L1 | Provider | 有状态 | 管理 UI 数据、加载和错误状态；在需要时监听 L2 就绪状态 |
 | L1 | API Service | 无认证状态 | 执行业务 HTTP、解析响应、识别会话过期、调用对应 L2 Auth 并有限重试 |
 | L2 | `SubsystemAuth` 实现 | 有状态 | 建立和缓存本子系统 session/token，声明真实的 L2 前置依赖 |
@@ -128,7 +115,7 @@ UI -> Provider -> API Service -> SubsystemAuth -> ScuAuth
 
 ## 3. 子系统依赖图
 
-[`SubsystemAuth`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/services/auth/subsystem_auth.dart) 的契约为：
+[`SubsystemAuth`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/scu_backend/core/subsystem_auth.dart) 的契约为：
 
 ```dart
 abstract interface class SubsystemAuth {
@@ -148,31 +135,25 @@ flowchart TD
     WFW["WfwAuth<br/>无 L2 前置依赖"]
     FITNESS["FitnessAuth<br/>无 L2 前置依赖"]
     CCYL["CcylAuth<br/>无 L2 前置依赖"]
-    ZHHQ["ZhhqAuth<br/>无 L2 前置依赖"]
-    NEWSVC["NewServiceAuth<br/>无 L2 前置依赖"]
     PAYAPP["PayAppAuth<br/>依赖 WfwAuth"]
 
     SCU --> ZHJW
     SCU --> WFW
     SCU --> FITNESS
     SCU -.OAuth code.-> CCYL
-    SCU --> ZHHQ
-    SCU --> NEWSVC
     SCU --> PAYAPP
     WFW -->|L2 dependency| PAYAPP
 ```
 
-这里的"无依赖"仅表示没有其他 **L2 子系统**作为前置条件。所有模块最终仍需要根认证；`CcylAuth` 还通过 SCU OAuth 获取 code。
+这里的“无依赖”仅表示没有其他 **L2 子系统**作为前置条件。所有模块最终仍需要根认证；`CcylAuth` 还通过 SCU OAuth 获取 code。
 
 | 模块 | L2 依赖 | 会话形式 | 关键行为 |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | `ZhjwAuth` | 无 | 共享 `CookieClient` 中的教务 cookie | 携带 SCU Bearer token 执行 JWT SSO；校验最终 HTTP 状态 |
 | `WfwAuth` | 无 | 共享 `CookieClient` 中的 WFW cookie | 跟随 WFW 登录重定向链完成 SSO 预热并校验最终业务响应，通过后才把 `isReady` 设为 `true` |
 | `FitnessAuth` | 无 | 共享 `CookieClient` 中的体测 cookie | 通过 `SsoRelayAuth` 完成 SSO 跳转 |
 | `PayAppAuth` | `WfwAuth` | 共享 `CookieClient` 中的 `airWarrant` 等 cookie | WFW 就绪后通过 `SsoRelayAuth` 完成缴费平台 SSO |
 | `CcylAuth` | 无 | 独立 OAuth token | token 与当前 SCU principal 绑定，不共享 cookie session |
-| `ZhhqAuth` | 无 | 独立 `CookieClient` + tokenKey | SSO（scdxplugin_jwt31）→ `login/auto` 换取 tokenKey；tokenKey 持久化到安全存储，`init()` 无条件恢复，业务请求只依赖 Token/TokenKey 头，不依赖 SCU 会话 |
-| `NewServiceAuth` | 无 | 共享 `CookieClient` | 校园网无感认证（Passpoint），绑定设备 MAC 自动认证 |
 
 ### 3.1 为什么 PayApp 依赖 WFW
 
@@ -180,9 +161,9 @@ flowchart TD
 
 ### 3.2 为什么 WFW 有独立的 ready 状态
 
-恢复 SCU token 或完成 `session/save` 只说明 `id.scu.edu.cn` session 可用，不代表 `wfw.scu.edu.cn` 已建立 session。WFW API 常带 `X-Requested-With`，未预热时服务端可能直接返回"用户信息已失效"，不会自动进入 SSO 重定向。
+恢复 SCU token 或完成 `session/save` 只说明 `id.scu.edu.cn` session 可用，不代表 `wfw.scu.edu.cn` 已建立 session。WFW API 常带 `X-Requested-With`，未预热时服务端可能直接返回“用户信息已失效”，不会自动进入 SSO 重定向。
 
-WFW 首页也不能用来预热：它匿名访问直接返回 200 并下发匿名 `eai-sess` cookie，永远不触发 SSO 链。因此 [`WfwAuth`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/services/auth/wfw_auth.dart) 必须：
+WFW 首页也不能用来预热：它匿名访问直接返回 200 并下发匿名 `eai-sess` cookie，永远不触发 SSO 链。因此 [`WfwAuth`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/scu_backend/wfw/wfw_auth.dart) 必须：
 
 1. 获取当前 `ScuAuth` 的 `CookieClient`。
 2. 不带 AJAX header 访问需登录的 `uc/wap/user/get-info` 并手动跟随重定向：匿名时链路为 get-info → `uc/wap/login` → `a_scu/api/cas/login` → `id.scu.edu.cn` CAS → 回跳 wfw 绑定用户 session。
@@ -191,12 +172,12 @@ WFW 首页也不能用来预热：它匿名访问直接返回 200 并下发匿�
 
 ## 4. AuthCoordinator 调度
 
-[`AuthCoordinator`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/services/auth/auth_coordinator.dart) 在统一认证成功后进行尽力而为的后台预热：
+[`AuthCoordinator`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/scu_backend/core/auth_coordinator.dart) 在统一认证成功后进行尽力而为的后台预热：
 
 ```text
-zhjw + wfw + fitness + ccyl + zhhq + newservice   concurrently
+zhjw + wfw + fitness + ccyl   concurrently
          |
-         +-> payapp   waits only for wfw
+         +-> payapp           waits only for wfw
 ```
 
 实际实现不是预先生成拓扑层，而是立即为所有顶级模块创建任务；每个任务递归等待自己的 `dependencies`。同一轮中，每个模块的 Future 会被缓存，因此被多个下游依赖时仍只执行一次。
@@ -218,7 +199,7 @@ zhjw + wfw + fitness + ccyl + zhhq + newservice   concurrently
 
 ## 5. 根认证 ScuAuth
 
-[`ScuAuth`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/services/auth/scu_auth.dart) 是根认证的单一事实来源，负责：
+[`ScuAuth`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/scu_backend/core/scu_auth.dart) 是根认证的单一事实来源，负责：
 
 - 获取验证码和 SM2 公钥，以 SM2 加密密码后登录。
 - 将 access token 存入 `FlutterSecureStorage`。
@@ -329,7 +310,7 @@ TTL 到期本身不会先把状态切换为 `expired`。系统会直接尝试刷
 根层和子系统层分别合并并发任务：
 
 | 场景 | 合并字段 |
-| --- | --- |
+|---|---|
 | 根 session 绑定 | `ScuAuth._bindSessionFuture` |
 | 根 token 刷新 | `ScuAuth._refreshCompleter` |
 | 一轮子系统预热 | `AuthCoordinator._warmUpFuture` |
@@ -337,7 +318,6 @@ TTL 到期本身不会先把状态切换为 `expired`。系统会直接尝试刷
 | WFW 登录链预热 | `WfwAuth._warmUpFuture` |
 | PayApp / Fitness SSO | `SsoRelayAuth._loginFuture` |
 | CCYL 自动重登录与过期恢复 | `CcylAuth._reLoginFuture` |
-| 智慧后勤 tokenKey 换取 | `ZhhqAuth._warmUpFuture`（single-flight） |
 
 ### 6.3 登出期间的旧任务
 
@@ -351,7 +331,7 @@ TTL 到期本身不会先把状态切换为 `expired`。系统会直接尝试刷
 
 ### 7.1 ZHJW / WFW / PayApp
 
-这三个 API Service 使用 [`retryOnUnauthenticated`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/services/api/api_request.dart)：
+这三个 API Service 使用 [`retryOnUnauthenticated`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/scu_backend/core/api_request.dart)：
 
 ```text
 getClient -> business request
@@ -364,11 +344,11 @@ getClient -> business request
 
 `invalidate()` 只清当前模块的缓存，不清理无关模块。普通网络错误、解析错误、限流和业务错误不会触发此重试。
 
-各 API Service 必须把该后端的"登录页、空响应、业务过期码"等明确识别为 `UnauthenticatedException`；不能把任意 HTML 或普通业务失败当成认证过期，否则可能错误重放写请求。
+各 API Service 必须把该后端的“登录页、空响应、业务过期码”等明确识别为 `UnauthenticatedException`；不能把任意 HTML 或普通业务失败当成认证过期，否则可能错误重放写请求。
 
 ### 7.2 CCYL
 
-CCYL 通过业务响应码表示 token 过期，因此使用 [`retryOnCcylAuthError`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/services/api/ccyl_api_service.dart)，不使用通用 wrapper：
+CCYL 通过业务响应码表示 token 过期，因此使用 [`retryOnCcylAuthError`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/scu_backend/ccyl/ccyl_api_service.dart)，不使用通用 wrapper：
 
 ```text
 ensureAuthenticated
@@ -382,34 +362,15 @@ ensureAuthenticated
 
 ### 7.3 Fitness
 
-体测目前没有独立 API Service，HTTP 和恢复逻辑仍位于 [`fitness_test_page.dart`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/pages/campus/fitness_test/fitness_test_page.dart)：
+体测通过独立的 [`FitnessApiService`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/scu_backend/fitness/fitness_api_service.dart)（第 1 层）承载业务 HTTP，页面仅通过 `FitnessTestProvider` 消费已解析的 `FitnessNotice` / `FitnessScore` 模型：
 
-- `FitnessAuth.getClient()` 按需建立 SSO。
-- `UnauthenticatedException` 会重试请求一次。
-- 体测业务响应明确表示 session 过期时，先 `FitnessAuth.invalidate()`，再重试一次。
+- `FitnessAuth.getClient()` 按需建立 SSO（`SsoRelayAuth`）。
+- `FitnessApiService._request` 统一走 `retryOnUnauthenticated(getClient, fn, invalidate: _auth.invalidate)`，业务响应中 `登录信息失效/请重新登录` 转为 `UnauthenticatedException` 后单次重试，其余 `ServiceException` 透传。
+- 解析与 HTML → 纯文本转换由 `FitnessNotice.fromJson` / `FitnessScore.fromJson` 负责，`fitness_test_page.dart` 不再直接持有 HTTP、重试或 `Map` 字段解析逻辑。
 
-这是当前实现的例外，不应据此把新的后端 HTTP 逻辑继续放入页面。后续若体测 API 扩大，应提取无状态 `FitnessApiService` 并统一恢复边界。
+### 7.4 HTTP ClientException
 
-### 7.4 Zhhq（在线报修）快速路径
-
-智慧后勤业务请求只依赖 `Token`/`TokenKey` 头，不依赖 SCU 会话，因此恢复策略与 cookie 型模块不同：
-
-```text
-getClientFast（tokenKey 已持久化/恢复）
-  -> business request（Token + TokenKey 头）
-  -> 4010-4017（token 错误）→ UnauthenticatedException
-  -> ZhhqAuth.invalidate() + 完整认证（SSO → login/auto 重建 tokenKey）
-  -> replay business request once
-```
-
-- `init()` 无条件从安全存储恢复 tokenKey，冷启动即可走快速路径，无需等待 SCU 会话。
-- 快速路径使用独立的 `CookieClient`（`getClientFast()`），与 SCU cookie 相互隔离。
-- 业务错误判定：`status` 明确非 `success` 或 `errorCode` 明确非 `0` 均抛 `ServiceException`（避免漏判错误响应）。
-- 图片上传是明文 JSON（不走 AES 解密），使用独立超时（30s，普通 JSON 请求 15s）。
-
-### 7.5 HTTP ClientException
-
-[`CookieClient`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/services/auth/cookie_client.dart) 在底层 `http.Client` 抛 `ClientException` 时会重建 client 并重发一次。这是传输层恢复，与认证重试相互独立。第二次失败直接上抛。
+[`CookieClient`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/scu_backend/core/cookie_client.dart) 在底层 `http.Client` 抛 `ClientException` 时会重建 client 并重发一次。这是传输层恢复，与认证重试相互独立。第二次失败直接上抛。
 
 ## 8. CCYL 的账号隔离
 
@@ -493,10 +454,10 @@ Provider 捕获最终异常并转换为页面状态，不实现 token、cookie �
 
 ## 11. 异常边界
 
-根认证异常定义在 [`scu_exceptions.dart`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/services/auth/scu_exceptions.dart)，CCYL 业务异常定义在 [`ccyl_service.dart`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/services/ccyl/ccyl_service.dart)：
+根认证异常定义在 [`scu_exceptions.dart`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/scu_backend/core/scu_exceptions.dart)，CCYL 业务异常定义在 [`ccyl_service.dart`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/scu_backend/ccyl/ccyl_service.dart)：
 
 | 异常 | 含义 | 自动重试 |
-| --- | --- | --- |
+|---|---|---|
 | `UnauthenticatedException` | 根或子系统认证失效 | 指定 API wrapper 中最多一次 |
 | `ServiceException` | HTTP、响应格式或服务端业务错误 | 不因认证机制自动重试 |
 | `RateLimitedException` | 明确的服务端限流 | 不自动重试 |
@@ -518,13 +479,12 @@ L3 ScuAuth
 ## 12. 持久化与敏感数据
 
 | 数据 | 存储 | 说明 |
-| --- | --- | --- |
+|---|---|---|
 | SCU access token | `FlutterSecureStorage` | 敏感凭据 |
 | SCU principal binding | `FlutterSecureStorage` | principal + token fingerprint |
 | 保存的账号密码 | `FlutterSecureStorage` | 仅自动登录使用 |
 | 自动登录开关 | `FlutterSecureStorage` | 与凭据策略一起管理 |
 | CCYL session | `FlutterSecureStorage` | token + userId + SCU principal |
-| 智慧后勤 tokenKey | `FlutterSecureStorage` | zhhq 域会话标识，与 SCU 会话独立 |
 | SCU 登录时间 | `SharedPreferences` | 本地 TTL 判断，不是凭据 |
 | 用户姓名、学号缓存 | `SharedPreferences` | 退出登录时清理 |
 
@@ -532,19 +492,26 @@ L3 ScuAuth
 
 - token、密码和 OAuth 凭据不得迁移到 `SharedPreferences`。
 - 日志不得记录 access token、密码、完整 OAuth code 或敏感 URL 参数。
-- 账号相关缓存必须绑定已确认的 principal，不能仅以"当前处于登录态"作为身份依据。
+- 账号相关缓存必须绑定已确认的 principal，不能仅以“当前处于登录态”作为身份依据。
 - 退出登录必须使飞行中的认证和持久化任务失效。
 
-### 12.1 认证日志
+### 12.1 应用日志
 
-[`AuthLogger`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/utils/auth_logger.dart) 是 GetIt 注册的全局单例。认证模块使用类名作为 tag，把关键状态变化写入默认 1000 条的内存环形缓冲：
+[`AppLogger`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/utils/app_logger.dart) 是 GetIt 注册的全局单例，是**全应用通用**日志器（认证模块只是最早的一批使用者，并非唯一使用者；业务模块经 `AppLog` 门面写入同一条流）。各模块使用类名作为 tag，把关键状态变化写入默认 1000 条的内存环形缓冲：
 
-- 每条消息先经过 `AuthLogRedactor`，再进入内存、控制台或文件。
-- redactor 处理 token、密码、Bearer header、OAuth code 和用户标识。
+- 每条消息先经过 `LogRedactor`，再进入内存、控制台或文件。
+- redactor 处理 token、密码、Bearer header、OAuth code 和用户标识；
+  身份标识覆盖 camelCase、snake_case 与中文「学号」标签三种写法，
+  但**不**脱敏 `account` / `id` / `sid` 等语义模糊的键——过度脱敏会抹掉排障信息。
 - 仅 debug 构建同步输出控制台日志。
-- 文件 sink 默认关闭；开发者页面可查看、过滤、清空和导出脱敏日志。
+- **文件落盘默认开启**：warn / error 写入 `<getLogBaseDir()>/Bugaoshan/logs/`，按 2 MB × 3 份自动轮转；debug / info 仅在内存。落盘开关位于开发者页面。
+- 日志由单个异步写入队列串行落盘，避免同步记录与异步轮转争抢文件。队列有容量上限，溢出计入 `droppedWriteLines`。
+- 开发者页面可查看、过滤、清空和导出脱敏日志；导出快照与自动落盘文件位于同一目录，关闭落盘开关只删除轮转文件，保留手动导出的快照。
+- 全局异常由 [`setupGlobalErrorHandlers()`](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/lib/utils/app_error_reporter.dart) 接管，在 binding 就绪后立即安装，覆盖框架异常、未捕获异步异常与当前 isolate 的错误监听，保留此前的处理器。启动失败亦经 `AppLog.e` 记录。
 
-新增认证日志时仍应避免主动拼入敏感值。脱敏器是最后一道保护，不是记录凭据的许可。
+认证记录使用 `authentication` 分类，业务记录使用 `business` 分类；异常和堆栈也在存储前脱敏。两类共享缓冲以保留请求与认证恢复的时间顺序。错误覆盖与查看方式见[运行日志架构](logging.md)。
+
+「清除所有数据」会删除落盘日志文件，与隐私政策 / EULA 的说明一致。新增日志时仍应避免主动拼入敏感值。脱敏器是最后一道保护，不是记录凭据的许可。
 
 ## 13. 依赖注入与生命周期
 
@@ -564,14 +531,10 @@ flowchart TD
     PAYAPP --> COORD
     FITNESS --> COORD
     CCYL --> COORD
-    ZHHQ --> COORD
-    NEWSVC --> COORD
     ZHJW --> ZAPI[ZhjwApiService]
     WFW --> WAPI[WfwApiService]
     PAYAPP --> PAPI[PayAppApiService]
     CCYL --> CAPI[CcylApiService]
-    ZHHQ --> ZHAPI[ZhhqApiService]
-    NEWSVC --> NAPI[NewServiceApiService]
     SCU --> SAP[ScuAuthProvider]
     CCYL --> SAP
     COORD --> SAP
@@ -583,8 +546,6 @@ flowchart TD
     PAPI --> BQP
     CCYL --> CP[CcylProvider]
     CAPI --> CP
-    ZHAPI --> ZRP[ZhhqRepairProvider]
-    NAPI --> PP[PasspointProvider]
 ```
 
 退出登录由 `ScuAuthProvider.logout()` 统一编排：
@@ -606,39 +567,33 @@ lib/
 │   ├── train_program_provider.dart
 │   ├── plan_completion_provider.dart
 │   ├── balance_query_provider.dart
-│   ├── ccyl_provider.dart
-│   ├── zhhq_repair_provider.dart   # 在线报修状态
-│   └── passpoint_provider.dart     # 校园网无感认证状态
-├── services/
-│   ├── api/
+│   └── ccyl_provider.dart
+├── scu_backend/                     # 川大子系统认证 / 网络 / API 服务（按子系统分目录）
+│   ├── core/
 │   │   ├── api_request.dart         # 通用认证失败重试一次
-│   │   ├── zhjw_api_service.dart
-│   │   ├── wfw_api_service.dart
-│   │   ├── payapp_api_service.dart
-│   │   ├── balance_query_service.dart
-│   │   ├── ccyl_api_service.dart    # CCYL 精确过期恢复
-│   │   ├── zhhq_api_service.dart    # 在线报修：tokenKey 快速路径 + 4010-4017 重建
-│   │   └── new_service_api_service.dart
-│   ├── auth/
 │   │   ├── auth_state.dart
 │   │   ├── scu_exceptions.dart
 │   │   ├── cookie_client.dart
 │   │   ├── scu_auth.dart            # L3 根认证
 │   │   ├── subsystem_auth.dart      # L2 契约
 │   │   ├── auth_coordinator.dart    # L2 调度
-│   │   ├── zhjw_auth.dart
-│   │   ├── wfw_auth.dart
-│   │   ├── sso_relay_auth.dart
-│   │   ├── payapp_auth.dart
-│   │   ├── fitness_auth.dart
-│   │   ├── ccyl_auth.dart
-│   │   ├── ccyl_oauth_service.dart
-│   │   ├── zhhq_auth.dart           # 在线报修：SSO → tokenKey，持久化快速路径
-│   │   └── new_service_auth.dart    # 校园网无感认证（Passpoint）
-│   └── ccyl/
-│       └── ccyl_service.dart        # CCYL 底层 HTTP 与业务错误分类
+│   │   └── sso_relay_auth.dart
+│   ├── zhjw/                        # zhjw_auth + zhjw_api_service + zhjw_html_parsers + models/
+│   ├── wfw/                         # wfw_auth + wfw_api_service
+│   ├── payapp/                      # payapp_auth + payapp_api_service + balance_query_service
+│   ├── ccyl/                        # ccyl_auth + ccyl_oauth_service + ccyl_service + models/
+│   ├── fitness/                     # fitness_auth + fitness_api_service + models/
+│   ├── reservation/                 # reservation_auth + reservation_api_service + models/
+│   ├── zhhq/                        # zhhq_auth + zhhq_api_service + zhhq_crypto
+│   ├── gs/                          # gs_auth + gs_api_service + gs_json_envelope + 课表抓取
+│   ├── passpoint/                   # new_service_auth + new_service_api_service
+│   ├── service_hall/                # service_auth + service_api_service + 表单辅助类
+│   ├── cloud_print/                 # cloud_print_auth + cloud_print_api_service
+│   ├── calendar/                    # academic_calendar_service
+│   └── forgot_password/             # forgot_password_service
 ├── utils/
-│   ├── auth_logger.dart             # 脱敏认证日志
+│   ├── app_logger.dart              # 脱敏应用日志（认证 + 业务共用）
+│   ├── app_error_reporter.dart      # 全局异常接管（框架/引擎/isolate）
 │   └── secure_storage.dart
 └── widgets/common/
     └── session_expired_listener.dart
@@ -679,7 +634,7 @@ lib/
 认证相关的重点回归测试位于：
 
 | 测试 | 覆盖内容 |
-| --- | --- |
+|---|---|
 | `test/scu_auth_test.dart` | 401/403、`invalid_token`、并发根刷新 single-flight |
 | `test/wfw_auth_test.dart` | 根 client 变化后重新预热、WFW 业务过期码后恢复一次 |
 | `test/payapp_session_expiry_test.dart` | PayApp 登录页识别、一次重试上限、普通 HTML 不误判 |

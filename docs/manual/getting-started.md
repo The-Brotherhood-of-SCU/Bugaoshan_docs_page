@@ -10,18 +10,18 @@ icon: mdi:rocket-launch-outline
 
 ## 下载与安装
 
-iPhone、iPad 用户请使用下方的 App Store 入口；Android、Windows 安装包可从项目的 [GitHub Releases](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/releases/latest) 页面获取。
+iPhone、iPad 和 macOS 用户可使用 App Store；Android、Windows 和 Linux 的安装包可从项目的 [GitHub Releases](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/releases/latest) 页面获取。
 
 ::: tip 无法连接Github?
 您可以加入官方QQ群（1102483776），从群文件下载安装包。
 :::
 
-- **iPhone / iPad**：前往 [App Store 下载不高山上](https://apps.apple.com/cn/app/%E4%B8%8D%E9%AB%98%E5%B1%B1%E4%B8%8A/id6813305962)，点击“获取”安装。系统版本与设备兼容性以 App Store 页面为准。
-- **Android**：不确定设备架构时，选择文件名带有 `universal` 的 APK。
+- **iPhone / iPad / macOS**：前往 [App Store 下载不高山上](https://apps.apple.com/cn/app/%E4%B8%8D%E9%AB%98%E5%B1%B1%E4%B8%8A/id6813305962)，点击“获取”安装。macOS 也可从 [Mac 版发布页](https://github.com/wjlfish/Bugaoshan-macos/releases) 下载签名、公证的 DMG。
+- **Android**：不确定设备架构时，选择文件名带有 `universal` 的 APK；也可从 [F-Droid](https://f-droid.org/packages/io.github.the_brotherhood_of_scu.bugaoshan) 安装。
 - **Windows**：下载 `windows_x64` ZIP，完整解压后运行程序，不要单独移动可执行文件。
-- **Linux**：目前没有随正式版 Release 发布的 Linux 安装包，需要按 [Linux 部署指南](./linux-deployment.md) 从源码构建。
+- **Linux**：下载 `linux_x64.tar.gz`，解压后运行 `./Bugaoshan`；也可按 [Linux 部署指南](./linux-deployment.md) 从源码构建。运行需要系统提供 GTK 3、libsecret、libepoxy 和 Wayland 等桌面依赖。
 
-Linux 的构建和运行需要 Linux 系统提供 GTK、WPE WebKit 等桌面依赖；macOS 的安装渠道以公告和 Release 页面实际提供的制品为准。
+HarmonyOS 版本正在邀测中，可加入官方 QQ 群（1102483776）参与测试。
 
 ## 首次启动
 

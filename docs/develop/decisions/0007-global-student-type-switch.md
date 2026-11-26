@@ -3,7 +3,6 @@ order: 7
 title: 学生身份为全局展示开关
 icon: mdi:account-switch-outline
 ---
-
 # ADR-0007：本科生 / 研究生身份为全局展示开关
 
 - 状态：已接受并实施

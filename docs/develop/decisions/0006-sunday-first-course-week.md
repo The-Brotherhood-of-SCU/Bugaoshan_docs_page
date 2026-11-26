@@ -3,7 +3,6 @@ order: 6
 title: 教学周按周日成行，全端统一周次口径
 icon: mdi:calendar-week-outline
 ---
-
 # ADR-0006：教学周按校历「周日~周六」成行，全端统一锚定口径
 
 - 状态：已接受并实施

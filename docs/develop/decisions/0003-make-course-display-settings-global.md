@@ -3,7 +3,6 @@ order: 3
 title: 课表显示偏好归属全局设置域
 icon: mdi:calendar-settings-outline
 ---
-
 # ADR-0003：课表显示偏好归属全局设置域
 
 - 状态：已接受并实施
@@ -13,7 +12,7 @@ icon: mdi:calendar-settings-outline
 
 ## 背景
 
-"显示教师""显示教室""显示周末"和"显示非本周课程"曾同时出现在全局课程表样式页和单课表设置页，并存入 `ScheduleConfig`。这造成三个问题：
+“显示教师”“显示教室”“显示周末”和“显示非本周课程”曾同时出现在全局课程表样式页和单课表设置页，并存入 `ScheduleConfig`。这造成三个问题：
 
 1. 用户在全局样式页修改设置，切换课表后结果变化。
 2. 同一开关在两个页面重复出现，所有权不清楚。
@@ -21,11 +20,12 @@ icon: mdi:calendar-settings-outline
 
 ## 决策
 
-四个显示偏好属于全局视觉设置：
+五个显示偏好属于全局视觉设置：
 
 ```text
 showTeacherName
 showLocation
+showCourseWeeks
 showWeekend
 showNonCurrentWeekCourses
 ```
@@ -33,18 +33,19 @@ showNonCurrentWeekCourses
 具体规则：
 
 1. 持久化所有权归 `AppConfigProvider`，使用 `SharedPreferences`。
-2. `ScheduleConfig` 不保存、复制或导出这四个字段。
-3. 四个开关只在全局课程表样式页编辑。
-4. 切换或新建课表不改变用户的持久化视觉偏好；导入行为见下方"未决边界"。
+2. `ScheduleConfig` 不保存、复制或导出这些字段。
+3. 这些开关只在全局课程表样式页编辑。
+4. 切换或新建课表不改变用户的持久化视觉偏好；导入行为见下方“未决边界”。
 5. 特定视图可以通过显式参数做临时覆盖，例如班级课表详情强制展示周末；局部覆盖不能写回全局值。
 6. `grid_logic` 等纯逻辑函数继续接收解析后的参数，不直接从 GetIt 读取设置，以保留测试边界。
 
 默认值为：
 
 | 设置 | 默认值 |
-| --- | --- |
+|---|---|
 | 显示教师 | `true` |
 | 显示教室 | `true` |
+| 显示课程周数 | `true` |
 | 显示周末 | `false` |
 | 显示非本周课程 | `true` |
 

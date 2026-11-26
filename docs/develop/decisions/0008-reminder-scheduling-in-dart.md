@@ -3,7 +3,6 @@ order: 8
 title: 提醒排期在 Dart 预计算
 icon: mdi:calendar-clock-outline
 ---
-
 # ADR-0008：提醒排期在 Dart 预计算，原生只按表投递
 
 - 状态：已接受并实施

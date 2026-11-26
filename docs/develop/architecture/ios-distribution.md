@@ -3,7 +3,6 @@ order: 6
 title: iOS TestFlight 分发
 icon: mdi:rocket-launch-outline
 ---
-
 # iOS App Store 与 TestFlight 分发
 
 本文记录本项目的本地 iOS 归档、签名和 TestFlight 分发流程；构建、上传成功和测试员可安装是三个需要分别核实的状态。GitHub 发布流水线见[发布流水线](release-pipeline.md)。
@@ -21,7 +20,7 @@ icon: mdi:rocket-launch-outline
 
 使用 macOS、满足 Apple 当前上传要求的 Xcode 和 CocoaPods。在本机安全配置开发者账户、签名证书及对应私钥、描述文件；Apple 开发者后台的两个 App ID 都需要启用同一个 App Group。App Store Connect 应用记录必须关联主应用 Bundle ID。凭据、私钥和本机签名配置不进入仓库。
 
-发布分支合入最新 `preview` 后，应保留其新增的提醒与实时活动注册；`ReminderChannel` 的 App Group 必须与主应用一致。数据库共享目录按平台区分：iOS 使用 `.ios` 后缀的 App Group，macOS 保留原有 App Group，避免影响 Mac 小组件。iOS 构建版本通过参数独立覆盖，不修改其他平台的版本号。
+发布分支合入最新 `preview` 后，应保留其新增的提醒与实时活动注册；`ReminderChannel` 的 App Group 必须与主应用一致。iOS 与共用商店条目的 macOS 版使用相同 Bundle ID 和 App Group 名称，但各设备的数据独立保存；旧 Mac 包的迁移边界见 [macOS 分发](macos-distribution.md)。iOS 构建版本通过参数独立覆盖，不修改其他平台的版本号。
 
 正式更新上传后，在 App Store Connect 中关联对应构建、更新版本说明并提交审核；沿用手动发布，审核通过后再发布。不要把上传成功当作审核通过。
 
@@ -76,7 +75,7 @@ flutter build ipa --release --export-method app-store \
 
 应用包含系统 HTTPS / 安全存储以外的加密实现：
 
-- `dart_sm` 的 SM2 C1C2C3 用于 SCU 登录密码加密，见 `lib/utils/sm2_crypto.dart`。
-- `encrypt` 的 AES-128-CBC + PKCS7 用于智慧后勤认证 Token 及业务响应解密，见 `lib/utils/zhhq_crypto.dart`。
+- `dart_sm` 的 SM2 C1C2C3 用于 SCU 登录密码加密，见 `lib/scu_backend/core/sm2_crypto.dart`。
+- `encrypt` 的 AES-128-CBC + PKCS7 用于智慧后勤认证 Token 及业务响应解密，见 `lib/scu_backend/zhhq/zhhq_crypto.dart`。
 
 因此不能把问卷回答为仅使用操作系统加密、仅 HTTPS 或全部仅用于身份认证。应按实际算法、用途及分发地区回答，依据 App Store Connect 的结果决定是否需要文档及 `ITSAppUsesNonExemptEncryption` 配置，不预先声明豁免。法国相关问题也按实际分发计划回答；Apple 当前说明中，标准算法对应的法国加密声明取决于是否在法国 App Store 分发。参见 [Apple 加密文档要求](https://developer.apple.com/help/app-store-connect/reference/app-information/export-compliance-documentation-for-encryption)及[问卷流程](https://developer.apple.com/help/app-store-connect/manage-app-information/determine-and-upload-app-encryption-documentation)。

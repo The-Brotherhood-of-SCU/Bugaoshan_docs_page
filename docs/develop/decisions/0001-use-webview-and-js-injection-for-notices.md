@@ -3,12 +3,11 @@ order: 1
 title: 通知页面采用 WebView 和站点 JS 适配
 icon: mdi:web
 ---
-
 # ADR-0001：通知页面采用 WebView 和站点 JS 适配
 
 - 状态：已接受并实施
 - 决策日期：2026-05-17
-- 当前实现：[通知 WebView 架构](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/docs/architecture/notice-webview.md)
+- 当前实现：[通知 WebView 架构](../architecture/notice-webview.md)
 
 ## 背景
 

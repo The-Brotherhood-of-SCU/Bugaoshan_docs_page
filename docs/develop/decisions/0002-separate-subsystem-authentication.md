@@ -3,13 +3,12 @@ order: 2
 title: 拆分子系统认证并显式声明依赖
 icon: mdi:shield-lock-outline
 ---
-
 # ADR-0002：拆分子系统认证并显式声明依赖
 
 - 状态：已接受并实施
 - 决策日期：2026-06-06
 - 实施提交：`7ded388`
-- 当前实现：[认证架构](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/blob/main/docs/architecture/authentication.md)
+- 当前实现：[认证架构](../architecture/authentication.md)
 
 ## 背景
 

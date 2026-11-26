@@ -13,12 +13,17 @@ dir:
 
 | 文档 | 对应 ADR | 范围 | 状态 |
 | --- | --- | --- | --- |
-| [通知 WebView 架构](./notice-webview.md) | [ADR-0001](../decisions/0001-use-webview-and-js-injection-for-notices.md) | 三类通知来源、JS bridge、附件下载和平台边界 | 当前实现 |
 | [认证架构](./authentication.md) | [ADR-0002](../decisions/0002-separate-subsystem-authentication.md) | SCU 根认证、子系统认证、重试、会话隔离和 DI | 当前实现 |
-| [Linux 分发架构](./linux-distribution.md) | [ADR-0004](../decisions/0004-use-distribution-wpe-on-linux.md) | GitHub tar.gz、WPE 边界、Flatpak、AUR 和 Debian 状态 | 当前实现 |
-| [发布流水线](./release-pipeline.md) | — | 两级分支流、预览/正式双通道、版本号模型与边界情况 | 当前实现 |
+| [运行日志](./logging.md) | — | 认证与业务分类、错误覆盖、脱敏和导出 | 当前实现 |
+| [通知 WebView 架构](./notice-webview.md) | [ADR-0001](../decisions/0001-use-webview-and-js-injection-for-notices.md) | 三类通知来源、JS bridge、附件下载和平台边界 | 当前实现 |
+| [Linux 分发架构](./linux-distribution.md) | [ADR-0010](../decisions/0010-remove-linux-native-webview.md) | 本地构建、网页视图边界、Flatpak、AUR 和 Debian 状态 | 当前实现 |
+| [Android 本地课前提醒](./local-reminder-android.md) | [ADR-0008](../decisions/0008-reminder-scheduling-in-dart.md) | Dart 预计算排期、原生投递、Alarm 权限与免打扰 | 设计说明与原型（未经真机验证） |
 | [iOS 液态玻璃适配](./ios-liquid-glass.md) | — | UIKit 系统标签栏、原生按钮/开关、Flutter 内容延伸与平台回退 | 当前实现 |
+| [iOS 全局侧滑返回](./ios-back-gesture.md) | — | 内容区任意位置起手返回、手势竞争、与 iOS 26 系统手势的关系 | 当前实现 |
+| [Android 系统栏底部避让](./android-system-bars.md) | — | edge-to-edge 下滚动容器显式 padding 的 inset 补齐与边界 | 当前实现 |
 | [iOS TestFlight 分发](./ios-distribution.md) | — | 本地归档、签名、上传、测试分发和加密问卷 | 当前实现 |
+| [macOS App Store 分发](./macos-distribution.md) | — | 共用 iOS 条目、原生玻璃控件、双架构构建、Sandbox 和签名 | 当前实现 |
+| [发布流水线](./release-pipeline.md) | — | 两级分支流、预览/正式双通道、版本号模型与边界情况 | 当前实现 |
 
 ::: tip 维护规则
 - 架构文档与代码冲突时以代码为准，并在同一变更中修正文档。

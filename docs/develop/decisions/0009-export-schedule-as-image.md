@@ -3,7 +3,6 @@ order: 9
 title: 课表导出为图片采用离屏挂载捕获
 icon: mdi:image-outline
 ---
-
 # ADR-0009：课表导出为图片采用「离屏挂载 + RepaintBoundary 捕获」
 
 - 状态：已接受并实施

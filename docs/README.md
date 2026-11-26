@@ -30,9 +30,11 @@ editLink: false
 ### 校园事务
 
 - 在线提交宿舍或教室设施的维修工单
+- 上传文档并通过图书馆终端刷校园卡确认打印，查看打印任务与扫描件
 - 在线提交离校请假申请，并查看请假、报备等申请记录
 - 办理返校报备、暑假离校和留校登记
 - 查询第二课堂活动、体测记录、空闲教室、校园网设备、校园卡和各类生活余额
+- 望江校区研究生活动室预约（提交、查看记录与按权限取消，部分需审批）
 - 查看校历、志愿四川、办事大厅和校园通知
 - 浏览教务处、党委学工部、青春川大通知，并下载和管理附件
 
@@ -52,20 +54,19 @@ editLink: false
 
 ## 下载与安装
 
-iPhone、iPad 用户可前往 [App Store 下载不高山上](https://apps.apple.com/cn/app/%E4%B8%8D%E9%AB%98%E5%B1%B1%E4%B8%8A/id6813305962)。Android、Windows 用户请前往 [GitHub Releases](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/releases/latest) 下载最新版本。
+iPhone、iPad 和 macOS 用户可前往 [App Store 下载不高山上](https://apps.apple.com/cn/app/%E4%B8%8D%E9%AB%98%E5%B1%B1%E4%B8%8A/id6813305962)。Android、Windows 和 Linux 用户请前往 [GitHub Releases](https://github.com/The-Brotherhood-of-SCU/Bugaoshan/releases/latest) 下载最新版本。
 
 ::: tip 无法连接Github?
 您可以加入官方QQ群（1102483776），从群文件下载安装包。
 :::
 
-当前主仓库的正式发布流程主要提供以下平台：
+当前主仓库的正式发布流程提供以下平台：
 
-- Android
-- Windows
+- Android（GitHub Releases / F-Droid）
+- Windows（GitHub Releases）
+- Linux x64（GitHub Releases 的 `linux_x64.tar.gz`；也可按[Linux 部署指南](./manual/linux-deployment.md)从源码构建）
 
-Linux 目前不提供正式版预编译安装包，需要按照[Linux 部署指南](./manual/linux-deployment.md)从源码构建。
-
-macOS 的安装渠道以项目公告和 Release 页面实际提供的制品为准。各平台的安装步骤请查看[快速入门](./manual/getting-started.md#下载与安装)。
+iOS 与 macOS 通过 [App Store](https://apps.apple.com/cn/app/id6813305962) 分发；macOS 另提供签名、公证的 DMG，由 [Mac 版发布页](https://github.com/wjlfish/Bugaoshan-macos/releases) 独立分发。各平台的安装步骤请查看[快速入门](./manual/getting-started.md#下载与安装)。
 
 ::: tip 邀测
 **鸿蒙版本正在邀测中**，欢迎加入官方 QQ 群（1102483776）参与测试。

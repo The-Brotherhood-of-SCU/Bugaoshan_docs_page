@@ -3,7 +3,6 @@ order: 5
 title: 撤销余额历史记录的账号隔离
 icon: mdi:account-group-outline
 ---
-
 # ADR-0005：撤销余额历史记录的账号隔离
 
 - 状态：已接受并实施
@@ -17,6 +16,7 @@ PR #198（`refactor/balance-provider-state`，merge commit `e354cec`）在把余
 2. 历史记录按账号隔离：房间标识 `roomKey` 增加 `balance-v2:$identity:` 前缀，同一房间在不同账号下是不同 key，各自采样、各自存历史。
 3. 绑定按账号分区存储：SharedPreferences key 变为 `balance_query_binding_<identity>` / `balance_query_current_room_<identity>`，并配套旧数据的按账号迁移逻辑。
 4. 登出清理：登出时清空 Provider 内存状态。
+
 
 ## 决策
 

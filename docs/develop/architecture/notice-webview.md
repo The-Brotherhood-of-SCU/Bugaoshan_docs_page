@@ -3,7 +3,6 @@ order: 1
 title: 通知 WebView 架构
 icon: mdi:web-box
 ---
-
 # 通知 WebView 架构
 
 > 文档状态：当前实现的权威说明
@@ -27,7 +26,7 @@ icon: mdi:web-box
 ## 2. 来源配置
 
 | 来源 | URL | 适配脚本 | 附件目录 | 标签 | 下载方式 |
-| --- | --- | --- | --- | --- | --- |
+|---|---|---|---|---|---|
 | 教务处 JWC | `https://jwc.scu.edu.cn/tzgg.htm` | `assets/js/jwc_notice_beautify.js` | `notice_attachments` | 0 | Dart HTTP |
 | 党委学工部 XGB | `https://xgb.scu.edu.cn/index/tzgg.htm` | `assets/js/party_notice_beautify.js` | `party_attachments` | 1 | Dart HTTP |
 | 团委 Tuanwei | `https://tuanwei.scu.edu.cn/index/gg.htm` | `assets/js/tuanwei_notice_beautify.js` | `tuanwei_attachments` | 2 | 面板下载先由 WebView 触发；Dart 落盘；附带团委 Referer |
@@ -68,7 +67,7 @@ flowchart TD
 - 加载来源 URL，处理前进、后退、关闭和外部浏览器打开。
 - 在 `onLoadStop` 注入 beautify script 和 `dom_ready.js`。
 - 显示 loading mask、错误 HTML 和附件悬浮按钮。
-- HarmonyOS 显示不支持页面。
+- 无 WebView 后端的平台（Linux）显示不支持页面。
 
 ### 3.2 `WebViewNoticeHandlers`
 
@@ -84,7 +83,7 @@ flowchart TD
 - 识别图片、外链和附件。
 - 把附件文件名以 Base64 编码后发送给 Flutter，避免跨 bridge 的字符编码问题。
 
-脚本仍强依赖官网 DOM。所谓"WebView 方案"只是把解析和适配从 Dart 转移到 JavaScript，不代表官网改版后无需维护。
+脚本仍强依赖官网 DOM。所谓“WebView 方案”只是把解析和适配从 Dart 转移到 JavaScript，不代表官网改版后无需维护。
 
 ## 4. 页面加载生命周期
 
@@ -108,7 +107,7 @@ initState
 ## 5. JavaScript bridge
 
 | Handler | 方向 | 参数 | Flutter 行为 |
-| --- | --- | --- | --- |
+|---|---|---|---|
 | `AttachmentsChannel` | JS -> Flutter | JSON 字符串；元素含 `url`、Base64 `name` | 解析附件并显示 FAB |
 | `DOMReady` | JS -> Flutter | 无 | 结束 loading mask，刷新导航状态 |
 | `DownloadAttachment` | JS -> Flutter | `url`, `name` | 合并 cookie/header，交给 `DownloadManager` |
@@ -190,9 +189,8 @@ WebView 触发 `onDownloadStarting` 时，Flutter 使用 suggested filename、We
 
 ## 9. 平台边界
 
-- Android、iOS、macOS、Windows 和 Linux 使用 `flutter_inappwebview` 对应后端。
-- Linux 依赖 WPE WebKit 运行库；普通 Linux bundle 不私带 WPE，Flatpak 在 `/app` 前缀提供，详见 [Linux 分发架构](./linux-distribution.md)。
-- HarmonyOS 当前直接显示 `WebViewUnsupportedPage`。
+- Android、iOS、macOS 和 Windows 使用 `flutter_inappwebview` 对应后端；HarmonyOS 由 fork 的 `flutter_inappwebview_ohos` 后端提供，不走不支持页。
+- Linux 没有可用的原生 WebView 后端（纯 Dart 占位实现），`WebViewUnsupportedPage` 会显示浏览器交接页，把通知地址交给系统默认浏览器打开，并提供复制链接兜底；判据是 `hasNoWebViewBackend`，详见 [Linux 分发架构](linux-distribution.md)。
 - WebView 后端行为可能影响下载回调、cookie 和窗口导航，新增平台必须验证完整通知与附件流程。
 
 ## 10. 已知技术债
